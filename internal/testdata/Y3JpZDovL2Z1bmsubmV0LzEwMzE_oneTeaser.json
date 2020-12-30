@@ -1,0 +1,117 @@
+{
+    "compilationType":"itemsOfShow",
+    "id":"Y3JpZDovL2Z1bmsubmV0LzEwMzE",
+    "pagination":{
+       "pageNumber":0,
+       "pageSize":2,
+       "totalElements":307
+    },
+    "personalized":false,
+    "links":{
+       "self":{
+          "id":"Y3JpZDovL2Z1bmsubmV0LzEwMzE",
+          "urlId":"Y3JpZDovL2Z1bmsubmV0LzEwMzE",
+          "title":"Walulis",
+          "href":"https://api.ardmediathek.de/page-gateway/widgets/ard/asset/Y3JpZDovL2Z1bmsubmV0LzEwMzE?pageNumber=0&pageSize=2&embedded=true&seasoned=false&seasonNumber=&withAudiodescription=false&withOriginalWithSubtitle=false&withOriginalversion=false",
+          "type":"application/vnd.ard.widget+json",
+          "partner":"ard"
+       }
+    },
+    "size":"m",
+    "swipeable":true,
+    "teasers":[
+       {
+          "availableTo":"2099-12-31T22:59:59Z",
+          "broadcastedOn":"2020-08-31T10:45:13Z",
+          "decor":"none",
+          "duration":595,
+          "id":"Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg",
+          "images":{
+             "aspect16x9":{
+                "alt":"Bild zur Sendung",
+                "producerName":"funk",
+                "src":"https://img.ardmediathek.de/standard/00/81/64/73/24/-1774185891/16x9/{width}?mandant=ard",
+                "title":"Geil, geiler, Bayern! Der Freistaat-Wahnsinn im TV erklärt | WALULIS - Standbild"
+             }
+          },
+          "longTitle":"Geil, geiler, Bayern! Der Freistaat-Wahnsinn im TV erklärt | WALULIS",
+          "mediumTitle":"Geil, geiler, Bayern! Der Freistaat-Wahnsinn im TV erklärt | WALULIS",
+          "personalized":false,
+          "playtime":null,
+          "publicationService":{
+             "name":"funk",
+             "logo":{
+                "title":"funk",
+                "alt":"funk",
+                "producerName":"SWR",
+                "src":"https://img.ardmediathek.de/standard/00/81/43/06/12/2121327408/16x9/{width}?mandant=ard",
+                "aspectRatio":"16x9"
+             },
+             "publisherType":"TV",
+             "partner":"funk",
+             "id":"b3JnYW5pemF0aW9uX2Z1bms"
+          },
+          "links":{
+             "self":{
+                "id":"Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg",
+                "urlId":"Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg",
+                "title":"Geil, geiler, Bayern! Der Freistaat-Wahnsinn im TV erklärt | WALULIS",
+                "href":"https://api.ardmediathek.de/page-gateway/teasers/ard/items/Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg",
+                "type":"application/vnd.ard.teaser+json",
+                "partner":"ard"
+             },
+             "target":{
+                "id":"Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg",
+                "urlId":"Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg",
+                "title":"Geil, geiler, Bayern! Der Freistaat-Wahnsinn im TV erklärt | WALULIS",
+                "href":"https://api.ardmediathek.de/page-gateway/pages/ard/item/Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg?devicetype=pc&embedded=true",
+                "type":"application/vnd.ard.page+json",
+                "partner":"ard"
+             }
+          },
+          "shortTitle":"Geil, geiler, Bayern! Der Freistaat-Wahnsinn im TV erklärt | WALULIS",
+          "show":{
+             "id":"crid://funk.net/1031",
+             "coremediaId":81453900,
+             "title":"Walulis",
+             "publisher":{
+                "name":"funk",
+                "logo":{
+                   "title":"funk",
+                   "alt":"funk",
+                   "producerName":"SWR",
+                   "src":"https://img.ardmediathek.de/standard/00/81/43/06/12/2121327408/16x9/{width}?mandant=ard",
+                   "aspectRatio":"16x9"
+                },
+                "publisherType":"TV",
+                "partner":"funk",
+                "id":"b3JnYW5pemF0aW9uX2Z1bms"
+             },
+             "self":null,
+             "images":{
+                "16x9":{
+                   "title":"Walulis - Bevorzugt",
+                   "alt":"Bild zur Sendereihe Walulis.",
+                   "producerName":"funk",
+                   "src":"https://img.ardmediathek.de/standard/00/81/45/39/04/2121327408/16x9/{width}?mandant=ard",
+                   "aspectRatio":"16x9"
+                }
+             },
+             "shortSynopsis":"Mediensatire im Internet: Walulis entlarvt mit Charme und Witz, wie Werbung, Fake-TV und überdrehte Influencer ihr Publikum veräppeln.",
+             "synopsis":"Mediensatire im Internet: Walulis entlarvt mit Charme und Witz, wie Werbung, Fake-TV und überdrehte Influencer ihr Publikum veräppeln.",
+             "longSynopsis":"WALULIS - die Medikamentenausgabe im Irrenhaus Internet. Das Gegengift zu YouTube-und TV-Schrott. Sie kennen sich mit Medien aus. Und wie man sie verarscht. Oder wie sie uns verarschen. Sad. Überdrehte YouTube-Stars, gefakte TV-Sendungen, bizarre Internetphänomene oder Facebook-Spinner: Walulis durchschaut sie. Ohne Gnade. Aber mit Witz. Und Glitzer.",
+             "modificationDate":null,
+             "groupingType":"SHOW",
+             "homepage":null,
+             "hasSeasons":false,
+             "seriesDetail":null
+          },
+          "subtitled":false,
+          "titleVisible":true,
+          "type":"ondemand"
+       }
+    ],
+    "title":"Walulis",
+    "titleVisible":true,
+    "type":"gridlist"
+ }

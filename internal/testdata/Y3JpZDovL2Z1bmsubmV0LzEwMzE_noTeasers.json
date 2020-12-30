@@ -1,0 +1,27 @@
+{
+    "compilationType":"itemsOfShow",
+    "id":"Y3JpZDovL2Z1bmsubmV0LzEwMzE",
+    "pagination":{
+       "pageNumber":0,
+       "pageSize":2,
+       "totalElements":307
+    },
+    "personalized":false,
+    "links":{
+       "self":{
+          "id":"Y3JpZDovL2Z1bmsubmV0LzEwMzE",
+          "urlId":"Y3JpZDovL2Z1bmsubmV0LzEwMzE",
+          "title":"Walulis",
+          "href":"https://api.ardmediathek.de/page-gateway/widgets/ard/asset/Y3JpZDovL2Z1bmsubmV0LzEwMzE?pageNumber=0&pageSize=2&embedded=true&seasoned=false&seasonNumber=&withAudiodescription=false&withOriginalWithSubtitle=false&withOriginalversion=false",
+          "type":"application/vnd.ard.widget+json",
+          "partner":"ard"
+       }
+    },
+    "size":"m",
+    "swipeable":true,
+    "teasers":[
+    ],
+    "title":"Walulis",
+    "titleVisible":true,
+    "type":"gridlist"
+ }
