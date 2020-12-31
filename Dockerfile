@@ -1,11 +1,10 @@
 FROM golang:alpine AS builder
-RUN apk add --no-cache make gcc musl-dev
+RUN apk add --no-cache make
 WORKDIR /go/src/app
 COPY . .
-RUN make build test
+RUN make RELEASE=1 build test
 
-FROM golang:alpine
-WORKDIR /opt
+FROM scratch
 COPY --from=builder /go/src/app/build/ard2rss /opt/ard2rss
 EXPOSE 8080
-CMD ["./ard2rss"]
+ENTRYPOINT ["/opt/ard2rss"]
