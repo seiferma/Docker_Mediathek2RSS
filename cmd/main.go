@@ -22,6 +22,7 @@ const maxEpisodes = 2
 var feedCache internal.Cache
 
 func main() {
+	feedCache = internal.CreateCache(cacheDuration)
 	http.HandleFunc("/show/id/", showByIDServer)
 	http.ListenAndServe(":8080", nil)
 }
