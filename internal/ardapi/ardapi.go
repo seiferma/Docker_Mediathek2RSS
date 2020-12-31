@@ -1,4 +1,4 @@
-package internal
+package ardapi
 
 import (
 	"encoding/json"

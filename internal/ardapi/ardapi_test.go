@@ -1,4 +1,4 @@
-package internal
+package ardapi
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ func TestGetShow(t *testing.T) {
 		if strings.Compare(expctedURL, url) != 0 {
 			t.Fatalf("We expected the URL %v but received %v.", expctedURL, url)
 		}
-		return ioutil.ReadFile("testdata/Y3JpZDovL2Z1bmsubmV0LzEwMzE.json")
+		return ioutil.ReadFile("../testdata/Y3JpZDovL2Z1bmsubmV0LzEwMzE.json")
 	}
 
 	// get a show from the API
@@ -38,7 +38,7 @@ func TestGetShowWithoutTeasers(t *testing.T) {
 	const maxEpisodes = 2
 	const showID = "test"
 	fnGet := func(url string) (result []byte, err error) {
-		return ioutil.ReadFile("testdata/Y3JpZDovL2Z1bmsubmV0LzEwMzE_noTeasers.json")
+		return ioutil.ReadFile("../testdata/Y3JpZDovL2Z1bmsubmV0LzEwMzE_noTeasers.json")
 	}
 
 	// get a show from the API
@@ -56,7 +56,7 @@ func TestGetShowWithLessThanMaxTeasers(t *testing.T) {
 	const maxEpisodes = 2
 	const showID = "test"
 	fnGet := func(url string) (result []byte, err error) {
-		result, err = ioutil.ReadFile("testdata/Y3JpZDovL2Z1bmsubmV0LzEwMzE_oneTeaser.json")
+		result, err = ioutil.ReadFile("../testdata/Y3JpZDovL2Z1bmsubmV0LzEwMzE_oneTeaser.json")
 		return
 	}
 
