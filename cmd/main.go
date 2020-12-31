@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 )
 
 // Constants (maybe make this configurable)
+const listenAddress = ":8080"
 const defaultMediaWidth = 1920
 const cacheDuration = 5 * time.Minute
 const maxEpisodes = 50
@@ -25,7 +27,8 @@ var feedCache internal.Cache
 func main() {
 	feedCache = internal.CreateCache(cacheDuration)
 	http.HandleFunc("/show/id/", showByIDServer)
-	http.ListenAndServe(":8080", nil)
+	log.Printf("Starting HTTP server on %v", listenAddress)
+	http.ListenAndServe(listenAddress, nil)
 }
 
 func showByIDServer(w http.ResponseWriter, r *http.Request) {
@@ -38,44 +41,59 @@ func showByIDServer(w http.ResponseWriter, r *http.Request) {
 	if !isValidShowID(showID) {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprint(w, "The given show ID is not valid.")
+		log.Print("Received a request for invalid show ID.")
+		return
 	}
+	requestedMediaWidth := defaultMediaWidth
+	widthParameter := r.URL.Query().Get("width")
+	if widthParameter != "" {
+		tmp, err := strconv.ParseInt(widthParameter, 10, 0)
+		if err == nil {
+			requestedMediaWidth = int(tmp)
+		}
+	}
+	log.Printf("Received a request for show ID %v with width %v.", showID, requestedMediaWidth)
 
 	// create ARD API
 	ardAPI := internal.CreateArdAPI(maxEpisodes, doGetRequest)
 
 	// create rss feed
-	rssFeedString, error := createRssFeedCached(showID, &ardAPI, &feedCache)
+	rssFeedString, error := createRssFeedCached(showID, requestedMediaWidth, &ardAPI, &feedCache)
 
 	// report an error
 	if error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, error)
+		log.Fatalf("There was an error while processing request for %v: %v", showID, error)
 	}
 
 	// return produced feed
 	w.Header().Add("Content-Type", "application/rss+xml")
 	fmt.Fprint(w, rssFeedString)
+	log.Printf("Successfully returing RSS feed for %v.", showID)
 }
 
-func createRssFeedCached(showID string, ardAPI *internal.ArdAPI, cache *internal.Cache) (result string, err error) {
+func createRssFeedCached(showID string, requestedMediaWidth int, ardAPI *internal.ArdAPI, cache *internal.Cache) (result string, err error) {
 	// directly return valid cache entry
+	cacheKey := getCacheKey(showID, requestedMediaWidth)
 	var foundCacheEntry bool
-	result, foundCacheEntry = cache.GetContent(showID)
+	result, foundCacheEntry = cache.GetContent(cacheKey)
 	if foundCacheEntry {
+		log.Printf("Answering request for %v from cache.", showID)
 		return
 	}
 
 	// calculate RSS feed
-	result, err = createRssFeed(showID, ardAPI)
+	result, err = createRssFeed(showID, requestedMediaWidth, ardAPI)
 
 	// cache result
 	if err == nil {
-		cache.StoreContent(showID, result)
+		cache.StoreContent(cacheKey, result)
 	}
 	return
 }
 
-func createRssFeed(showID string, ardAPI *internal.ArdAPI) (result string, err error) {
+func createRssFeed(showID string, requestedMediaWidth int, ardAPI *internal.ArdAPI) (result string, err error) {
 	var showInitial internal.Show
 	showInitial, err = ardAPI.GetShow(showID)
 	if err != nil {
@@ -86,7 +104,7 @@ func createRssFeed(showID string, ardAPI *internal.ArdAPI) (result string, err e
 	feedTitle := showInitial.Teasers[0].Show.Title
 	feedDescription := showInitial.Teasers[0].Show.LongSynopsis
 	feedImage := getFeedImage(showInitial.Teasers[0].Show.Images)
-	feedImageURL, feedImageAlt := getFeedImageURLAndAlt(feedImage)
+	feedImageURL, feedImageAlt := getFeedImageURLAndAlt(feedImage, requestedMediaWidth)
 
 	feedItems := make([]rssfeed.FeedItem, len(showInitial.Teasers))
 	for i, teaser := range showInitial.Teasers {
@@ -100,13 +118,13 @@ func createRssFeed(showID string, ardAPI *internal.ArdAPI) (result string, err e
 		mediaStreams := video.Widgets[0].MediaCollection.Embedded.MediaArray[0].MediaStreamArray
 		synopsis := video.Widgets[0].Synopsis
 		videoImage := video.Widgets[0].Image
-		videoImageURL, _ := getFeedImageURLAndAlt(videoImage)
+		videoImageURL, _ := getFeedImageURLAndAlt(videoImage, requestedMediaWidth)
 
 		lastWidth := 0
 		var lastURL string
 		for _, mediaStream := range mediaStreams {
-			newDistance := math.Abs(float64(defaultMediaWidth - mediaStream.Width))
-			oldDistance := math.Abs(float64(defaultMediaWidth - lastWidth))
+			newDistance := math.Abs(float64(requestedMediaWidth - mediaStream.Width))
+			oldDistance := math.Abs(float64(requestedMediaWidth - lastWidth))
 			if strings.Contains(mediaStream.Stream, "mp4") && newDistance < oldDistance {
 				lastWidth = mediaStream.Width
 				lastURL = mediaStream.Stream
@@ -164,8 +182,8 @@ func getFeedImage(feedImageCandidates map[string](internal.ShowImage)) internal.
 	return feedImageCandidate
 }
 
-func getFeedImageURLAndAlt(img internal.ShowImage) (url, alt string) {
-	url = strings.Replace(img.Src, "{width}", toString(defaultMediaWidth), -1)
+func getFeedImageURLAndAlt(img internal.ShowImage, requestedMediaWidth int) (url, alt string) {
+	url = strings.Replace(img.Src, "{width}", toString(requestedMediaWidth), -1)
 	alt = img.Alt
 	return
 }
@@ -189,4 +207,8 @@ func doGetRequest(URL string) (result []byte, err error) {
 
 func toString(input interface{}) string {
 	return fmt.Sprintf("%v", input)
+}
+
+func getCacheKey(showID string, requestedWidth int) string {
+	return fmt.Sprintf("%v-%v", showID, requestedWidth)
 }
