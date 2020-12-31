@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -16,7 +17,7 @@ import (
 // Constants (maybe make this configurable)
 const defaultMediaWidth = 1920
 const cacheDuration = 5 * time.Minute
-const maxEpisodes = 2
+const maxEpisodes = 50
 
 // Global state
 var feedCache internal.Cache
@@ -34,6 +35,10 @@ func showByIDServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	showID := urlSegments[len(urlSegments)-1]
+	if !isValidShowID(showID) {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "The given show ID is not valid.")
+	}
 
 	// create ARD API
 	ardAPI := internal.CreateArdAPI(maxEpisodes, doGetRequest)
@@ -140,6 +145,12 @@ func createRssFeed(showID string, ardAPI *internal.ArdAPI) (result string, err e
 	}
 	result, err = feed.SerializeToString()
 	return
+}
+
+func isValidShowID(showID string) bool {
+	idRegex, _ := regexp.Compile("^[a-zA-Z0-9]+$")
+	showIDBytes := []byte(showID)
+	return idRegex.Match(showIDBytes)
 }
 
 func getFeedImage(feedImageCandidates map[string](internal.ShowImage)) internal.ShowImage {

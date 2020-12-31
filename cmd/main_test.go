@@ -173,6 +173,22 @@ func TestConvertToString(t *testing.T) {
 	assertConvertEquals(t, "a", "a")
 }
 
+func TestIsValidShowID(t *testing.T) {
+	assertIsValidShowID(t, "", false)
+	assertIsValidShowID(t, "a", true)
+	assertIsValidShowID(t, "a1", true)
+	assertIsValidShowID(t, "b2H", true)
+	assertIsValidShowID(t, "b2H?", false)
+	assertIsValidShowID(t, "a\\q", false)
+}
+
+func assertIsValidShowID(t *testing.T, idToTest string, expectedResult bool) {
+	actual := isValidShowID(idToTest)
+	if actual != expectedResult {
+		t.Fatalf("Expected the validation of %v to return %v but got %v.", idToTest, expectedResult, actual)
+	}
+}
+
 func assertConvertEquals(t *testing.T, v interface{}, expected string) {
 	actual := toString(v)
 	assertStringEquals(t, expected, actual)
