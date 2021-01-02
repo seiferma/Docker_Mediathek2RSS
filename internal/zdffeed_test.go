@@ -3,7 +3,7 @@ package internal
 import (
 	"testing"
 
-	"github.com/seiferma/docker-ard2rss/internal/zdfapi"
+	"github.com/seiferma/docker_mediathek2rss/internal/zdfapi"
 )
 
 func TestFindBestMatchingImageURL(t *testing.T) {

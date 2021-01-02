@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/seiferma/docker-ard2rss/internal/ardapi"
-	"github.com/seiferma/docker-ard2rss/internal/rssfeed"
+	"github.com/seiferma/docker_mediathek2rss/internal/ardapi"
+	"github.com/seiferma/docker_mediathek2rss/internal/rssfeed"
 )
 
 // CreateArdRssFeed creates an RSS feed for an ARD show.

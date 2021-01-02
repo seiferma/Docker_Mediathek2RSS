@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/seiferma/docker-ard2rss/internal"
-	"github.com/seiferma/docker-ard2rss/internal/ardapi"
-	"github.com/seiferma/docker-ard2rss/internal/zdfapi"
+	"github.com/seiferma/docker_mediathek2rss/internal"
+	"github.com/seiferma/docker_mediathek2rss/internal/ardapi"
+	"github.com/seiferma/docker_mediathek2rss/internal/zdfapi"
 )
 
 // Constants (maybe make this configurable)

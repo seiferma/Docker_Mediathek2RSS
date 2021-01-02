@@ -1,5 +1,5 @@
-APPNAME:=ard2rss
-IMAGE_NAME:=ard2rss
+APPNAME:=mediathek2rss
+IMAGE_NAME:=mediathek2rss
 RELEASE?=0
 CGO_ENABLED?=0
 

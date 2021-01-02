@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/seiferma/docker-ard2rss/internal/rssfeed"
-	"github.com/seiferma/docker-ard2rss/internal/zdfapi"
+	"github.com/seiferma/docker_mediathek2rss/internal/rssfeed"
+	"github.com/seiferma/docker_mediathek2rss/internal/zdfapi"
 )
 
 const wantedMimeType = "video/mp4"

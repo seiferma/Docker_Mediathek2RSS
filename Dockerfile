@@ -5,6 +5,6 @@ COPY . .
 RUN make RELEASE=1 build test
 
 FROM scratch
-COPY --from=builder /go/src/app/build/ard2rss /opt/ard2rss
+COPY --from=builder /go/src/app/build/mediathek2rss /opt/mediathek2rss
 EXPOSE 8080
-ENTRYPOINT ["/opt/ard2rss"]
+ENTRYPOINT ["/opt/mediathek2rss"]

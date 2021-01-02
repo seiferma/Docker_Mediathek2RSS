@@ -1,4 +1,4 @@
-module github.com/seiferma/docker-ard2rss
+module github.com/seiferma/docker_mediathek2rss
 
 go 1.14
 

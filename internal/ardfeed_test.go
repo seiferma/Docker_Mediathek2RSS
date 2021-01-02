@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/seiferma/docker-ard2rss/internal/ardapi"
+	"github.com/seiferma/docker_mediathek2rss/internal/ardapi"
 )
 
 const defaultMediaWidth = 1920
