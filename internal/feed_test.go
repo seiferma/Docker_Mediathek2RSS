@@ -34,6 +34,15 @@ func TestCreateRssFeedCachedValid(t *testing.T) {
 	assertEquals(t, "2", result)
 }
 
+func TestGetCacheKey(t *testing.T) {
+	assertGetCacheKey(t, "123", 123, "123#123")
+}
+
+func assertGetCacheKey(t *testing.T, showID string, requestedWidth int, expectedKey string) {
+	cacheKey := getCacheKey(showID, requestedWidth)
+	assertEquals(t, expectedKey, cacheKey)
+}
+
 func assertEquals(t *testing.T, expected, actual string) {
 	if expected != actual {
 		t.Fatalf("Expected %v but got %v.", expected, actual)

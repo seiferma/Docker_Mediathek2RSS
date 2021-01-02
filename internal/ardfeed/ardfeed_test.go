@@ -1,4 +1,4 @@
-package internal
+package ardfeed
 
 import (
 	"errors"
@@ -59,7 +59,7 @@ func createRssFeedMocked(showID string, maxEpisodes int, requestedMediaWidth int
 		result, err = ioutil.ReadFile("testdata/" + filename)
 		return
 	}
-	ardAPI := ardapi.CreateArdAPI(maxEpisodes, fnGetHTTP)
+	ardAPI := ardapi.CreateArdAPIWithGetFunc(maxEpisodes, fnGetHTTP)
 	result, err = fnCreate(showID, requestedMediaWidth, &ardAPI)
 	return
 }
@@ -122,17 +122,6 @@ func TestConvertToString(t *testing.T) {
 	assertConvertEquals(t, 1, "1")
 	assertConvertEquals(t, 5.9, "5.9")
 	assertConvertEquals(t, "a", "a")
-}
-
-func TestGetCacheKey(t *testing.T) {
-	assertGetCacheKey(t, "123", 123, "123#123")
-}
-
-func assertGetCacheKey(t *testing.T, showID string, requestedWidth int, expectedKey string) {
-	cacheKey := getCacheKey(showID, requestedWidth)
-	if expectedKey != cacheKey {
-		t.Fatalf("Expected cache key %v but got %v.", expectedKey, cacheKey)
-	}
 }
 
 func assertConvertEquals(t *testing.T, v interface{}, expected string) {

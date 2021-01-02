@@ -1,4 +1,4 @@
-package internal
+package zdffeed
 
 import (
 	"testing"
@@ -26,4 +26,10 @@ func assertFindBestMatchingImageURL(t *testing.T, expected string, images map[st
 	}
 	actual := findBestMatchingImageURL(image)
 	assertEquals(t, expected, actual)
+}
+
+func assertEquals(t *testing.T, expected, actual string) {
+	if expected != actual {
+		t.Fatalf("Expected %v but got %v.", expected, actual)
+	}
 }

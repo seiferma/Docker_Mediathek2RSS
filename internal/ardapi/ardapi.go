@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"time"
 )
 
@@ -67,8 +69,14 @@ type ShowVideo struct {
 
 // CreateArdAPI creates a new API instance taking configuration values to be considered when working with the API.
 // The maxEpisodes parameter defines how many episodes of a show shall be received at most.
+func CreateArdAPI(maxEpisodes int) ArdAPI {
+	return CreateArdAPIWithGetFunc(maxEpisodes, doGetRequest)
+}
+
+// CreateArdAPIWithGetFunc creates a new API instance taking configuration values to be considered when working with the API.
+// The maxEpisodes parameter defines how many episodes of a show shall be received at most.
 // The fnGetRequest parameter provides a function that carries out a get request and provides the body as byte array.
-func CreateArdAPI(maxEpisodes int, fnGetRequest func(string) ([]byte, error)) ArdAPI {
+func CreateArdAPIWithGetFunc(maxEpisodes int, fnGetRequest func(string) ([]byte, error)) ArdAPI {
 	return ArdAPI{
 		maxEpisodes:  maxEpisodes,
 		fnGetRequest: fnGetRequest,
@@ -126,4 +134,21 @@ func (show Show) hasAtLeastOneValidTeaser() bool {
 	}
 
 	return true
+}
+
+func doGetRequest(URL string) (result []byte, err error) {
+	var resp *http.Response
+	resp, err = http.Get(URL)
+	if err != nil {
+		log.Fatalf("Received HTTP response %v for URL %v.", resp.StatusCode, URL)
+		return
+	}
+	defer resp.Body.Close()
+
+	result, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("Could not read body from GET request to URL %v.", URL)
+		return
+	}
+	return
 }

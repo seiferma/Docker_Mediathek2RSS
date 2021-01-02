@@ -19,7 +19,7 @@ func TestGetShow(t *testing.T) {
 	}
 
 	// get a show from the API
-	ardAPI := CreateArdAPI(maxEpisodes, fnGet)
+	ardAPI := CreateArdAPIWithGetFunc(maxEpisodes, fnGet)
 	result, err := ardAPI.GetShow(showID)
 
 	// assert results
@@ -42,7 +42,7 @@ func TestGetShowWithoutTeasers(t *testing.T) {
 	}
 
 	// get a show from the API
-	ardAPI := CreateArdAPI(maxEpisodes, fnGet)
+	ardAPI := CreateArdAPIWithGetFunc(maxEpisodes, fnGet)
 	_, err := ardAPI.GetShow(showID)
 
 	// assert results
@@ -61,7 +61,7 @@ func TestGetShowWithLessThanMaxTeasers(t *testing.T) {
 	}
 
 	// get a show from the API
-	ardAPI := CreateArdAPI(maxEpisodes, fnGet)
+	ardAPI := CreateArdAPIWithGetFunc(maxEpisodes, fnGet)
 	result, err := ardAPI.GetShow(showID)
 
 	// assert results

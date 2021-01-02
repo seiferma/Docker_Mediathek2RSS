@@ -1,11 +1,8 @@
-package internal
+package ardfeed
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 	"math"
-	"net/http"
 	"strings"
 
 	"github.com/seiferma/docker_mediathek2rss/internal/ardapi"
@@ -104,24 +101,6 @@ func getFeedImage(feedImageCandidates map[string](ardapi.ShowImage)) ardapi.Show
 func getFeedImageURLAndAlt(img ardapi.ShowImage, requestedMediaWidth int) (url, alt string) {
 	url = strings.Replace(img.Src, "{width}", toString(requestedMediaWidth), -1)
 	alt = img.Alt
-	return
-}
-
-// DoGetRequest performs a simple HTTP GET request to the given URL
-func DoGetRequest(URL string) (result []byte, err error) {
-	var resp *http.Response
-	resp, err = http.Get(URL)
-	if err != nil {
-		log.Fatalf("Received HTTP response %v for URL %v.", resp.StatusCode, URL)
-		return
-	}
-	defer resp.Body.Close()
-
-	result, err = ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("Could not read body from GET request to URL %v.", URL)
-		return
-	}
 	return
 }
 
