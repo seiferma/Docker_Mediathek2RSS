@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/seiferma/docker-ard2rss/internal"
 	"github.com/seiferma/docker-ard2rss/internal/ardapi"
+	"github.com/seiferma/docker-ard2rss/internal/zdfapi"
 )
 
 // Constants (maybe make this configurable)
@@ -18,6 +20,7 @@ const listenAddress = ":8080"
 const defaultMediaWidth = 1920
 const cacheDuration = 5 * time.Minute
 const maxEpisodes = 50
+const zdfShowByPathPrefix = "/zdf/show/byPath/"
 
 // Global state
 var feedCache internal.Cache
@@ -25,6 +28,7 @@ var feedCache internal.Cache
 func main() {
 	feedCache = internal.CreateCache(cacheDuration)
 	http.HandleFunc("/ard/show/", ardShowByIDServer)
+	http.HandleFunc(zdfShowByPathPrefix, zdfShowByPathServer)
 	log.Printf("Starting HTTP server on %v", listenAddress)
 	http.ListenAndServe(listenAddress, nil)
 }
@@ -44,21 +48,17 @@ func ardShowByIDServer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// extract requested media width from request
-	requestedMediaWidth := defaultMediaWidth
-	widthParameter := r.URL.Query().Get("width")
-	if widthParameter != "" {
-		tmp, err := strconv.ParseInt(widthParameter, 10, 0)
-		if err == nil {
-			requestedMediaWidth = int(tmp)
-		}
-	}
+	requestedMediaWidth := getRequestedWidth(r.URL)
 	log.Printf("Received a request for show ID %v with width %v.", showID, requestedMediaWidth)
 
 	// create ARD API
 	ardAPI := ardapi.CreateArdAPI(maxEpisodes, internal.DoGetRequest)
 
 	// create RSS feed
-	rssFeedString, error := internal.CreateArdRssFeedCached(showID, requestedMediaWidth, &ardAPI, &feedCache)
+	fnCreateRss := func(showID string, width int) (string, error) {
+		return internal.CreateArdRssFeed(showID, width, &ardAPI)
+	}
+	rssFeedString, error := internal.CreateRssFeedCached(showID, requestedMediaWidth, &feedCache, fnCreateRss)
 
 	// report an error
 	if error != nil {
@@ -77,4 +77,62 @@ func isValidArdShowID(showID string) bool {
 	idRegex, _ := regexp.Compile("^[a-zA-Z0-9]+$")
 	showIDBytes := []byte(showID)
 	return idRegex.Match(showIDBytes)
+}
+
+func zdfShowByPathServer(w http.ResponseWriter, r *http.Request) {
+	// extract show path from URL
+	showPath := strings.Replace(r.URL.Path, zdfShowByPathPrefix, "", -1)
+	if !isValidZdfPath(showPath) {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "The given show path is not valid.")
+		log.Print("Received a request for invalid show path.")
+		return
+	}
+
+	// extract requested media width from request
+	requestedMediaWidth := getRequestedWidth(r.URL)
+	log.Printf("Received a request for show path %v with width %v.", showPath, requestedMediaWidth)
+
+	// create ARD API
+	zdfAPI, err := zdfapi.CreateZDFApi(maxEpisodes)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, err)
+		log.Fatalf("There was an error while initializing the ZDF API: %v", err)
+	}
+
+	// create RSS feed
+	fnCreateRss := func(showPath string, width int) (string, error) {
+		return internal.CreateZdfRssFeed(showPath, width, &zdfAPI)
+	}
+	rssFeedString, err := internal.CreateRssFeedCached(showPath, requestedMediaWidth, &feedCache, fnCreateRss)
+
+	// report an error
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, err)
+		log.Fatalf("There was an error while processing request for %v: %v", showPath, err)
+	}
+
+	// return produced feed
+	w.Header().Add("Content-Type", "application/rss+xml")
+	fmt.Fprint(w, rssFeedString)
+	log.Printf("Successfully returing RSS feed for %v.", showPath)
+}
+
+func isValidZdfPath(path string) bool {
+	regex := regexp.MustCompile("^([a-zA-Z0-9-]+/)*[a-zA-Z0-9-]+$")
+	return regex.Match([]byte(path))
+}
+
+func getRequestedWidth(URL *url.URL) int {
+	requestedMediaWidth := defaultMediaWidth
+	widthParameter := URL.Query().Get("width")
+	if widthParameter != "" {
+		tmp, err := strconv.ParseInt(widthParameter, 10, 0)
+		if err == nil {
+			requestedMediaWidth = int(tmp)
+		}
+	}
+	return requestedMediaWidth
 }

@@ -28,7 +28,6 @@ type Channel struct {
 	ITunesSummary  *ITunesSummary   `xml:"itunes:summary"`
 	ITunesCategory string           `xml:"itunes:category,omitempty"`
 	ITunesImage    *ITunesImage     `xml:"itunes:image"`
-	ITunesExplicit bool             `xml:"itunes:explicit"`
 	FeedItems      []FeedItem       `xml:"item"`
 }
 
@@ -42,8 +41,8 @@ type ITunesSummary struct {
 type Image struct {
 	XMLName xml.Name `xml:"image"`
 	URL     string   `xml:"url"`
-	Title   string   `xml:"title,omitempty"`
-	Link    string   `xml:"link,omitempty"`
+	Title   string   `xml:"title"`
+	Link    string   `xml:"link"`
 	Height  int      `xml:"height,omitempty"`
 	Width   int      `xml:"width,omitempty"`
 }
@@ -61,13 +60,20 @@ type FeedItem struct {
 	Link                 string             `xml:"link,omitempty"`
 	Description          *FeedDescription   `xml:"description"`
 	PubDate              *time.Time         `xml:"pubDate"`
-	GUID                 string             `xml:"guid,omitempty"`
+	GUID                 *FeedGUID          `xml:"guid"`
 	Enclosure            *FeedItemEnclosure `xml:"enclosure"`
 	ITunesDurationString string             `xml:"itunes:duration,omitempty"`
 	ITunesTitle          string             `xml:"itunes:title,omitempty"`
 	ITunesSubtitle       string             `xml:"itunes:subtitle,omitempty"`
 	ITunesSummary        *ItunesSummary     `xml:"itunes:summary"`
 	ITunesImage          *ITunesImage       `xml:"itunes:image"`
+}
+
+// FeedGUID represents a GUID in an RSS feed.
+type FeedGUID struct {
+	XMLName   xml.Name `xml:"guid"`
+	PermaLink bool     `xml:"isPermaLink,attr"`
+	Text      string   `xml:",innerxml"`
 }
 
 // FeedDescription represents the RSS description element.
@@ -85,9 +91,9 @@ type ItunesSummary struct {
 // FeedItemEnclosure represents enclosures (media elements) within the feed items.
 type FeedItemEnclosure struct {
 	XMLName xml.Name `xml:"enclosure"`
-	URL     string   `xml:"url"`
-	Type    string   `xml:"type"`
-	Length  string   `xml:"length,omitempty"`
+	URL     string   `xml:"url,attr"`
+	Type    string   `xml:"type,attr"`
+	Length  string   `xml:"length,omitempty,attr"`
 }
 
 // CreateFeed creates and initializes the RSS feed.

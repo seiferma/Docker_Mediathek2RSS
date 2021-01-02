@@ -35,7 +35,9 @@ func TestExampleFeed(t *testing.T) {
 					Text: "Some long description.",
 				},
 				ITunesDurationString: CreateItunesDurationStringFromSeconds(422),
-				GUID:                 "foo-bar-uuid",
+				GUID: &FeedGUID{
+					Text: "foo-bar-uuid",
+				},
 				ITunesImage: &ITunesImage{
 					URL: "http://foo.bar/item.png",
 				},
@@ -61,8 +63,8 @@ func TestExampleFeed(t *testing.T) {
 	expected := string(expectedBytes)
 
 	if strings.Compare(expected, result) != 0 {
+		t.Logf("Expected:\n%v\nActual:\n%v", expected, string(result))
 		t.Fatal("There were differences between the expected and the actual XML string")
-		t.Logf("\n%v\n", string(result))
 	}
 
 }

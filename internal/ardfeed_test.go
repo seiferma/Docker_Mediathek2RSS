@@ -5,67 +5,15 @@ import (
 	"io/ioutil"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/seiferma/docker-ard2rss/internal/ardapi"
 )
 
 const defaultMediaWidth = 1920
-const cacheDuration = 5 * time.Minute
-
-func TestCreateRssFeedCachedValid(t *testing.T) {
-	// mock cache
-	currentTime := time.Unix(0, 0)
-	fnNow := func() time.Time {
-		return currentTime
-	}
-	cache := CreateCacheWithNowFunction(cacheDuration, fnNow)
-
-	// inject cache mock into function to be tested
-	fnCreate := func(showID string, requestedMediaWidth int, ardAPI *ardapi.ArdAPI) (result string, err error) {
-		return CreateArdRssFeedCached(showID, requestedMediaWidth, ardAPI, &cache)
-	}
-
-	// provide mock data to the HTTP GET function
-	urlToFilename := map[string](string){}
-	urlToFilename["https://api.ardmediathek.de/page-gateway/widgets/ard/asset/Y3JpZDovL2Z1bmsubmV0LzEwMzE?pageNumber=0&pageSize=2"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzE.json"
-	urlToFilename["https://api.ardmediathek.de/page-gateway/pages/ard/item/Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg?devicetype=pc&embedded=true"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg.json"
-	urlToFilename["https://api.ardmediathek.de/page-gateway/pages/ard/item/Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNjkzOA?devicetype=pc&embedded=true"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNjkzOA.json"
-
-	// test creating the feed
-	result, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilename, fnCreate)
-	if err != nil {
-		t.Fatalf("There should not be an error.\n%v", err)
-	}
-	expectedBytes, err := ioutil.ReadFile("testdata/Y3JpZDovL2Z1bmsubmV0LzEwMzE.xml")
-	expected := string(expectedBytes)
-	if result != expected {
-		// ioutil.WriteFile("testdata/actual.xml", []byte(result), 0644)
-		// ioutil.WriteFile("testdata/expected.xml", []byte(expected), 0644)
-		t.Fatalf("The created XML is not as expected. Created:\n%v\n\nExpected:\n%v", result, expected)
-	}
-
-	// test reading from cache
-	urlToFilenameEmpty := map[string](string){}
-	result2, err2 := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilenameEmpty, fnCreate)
-	if err2 != nil {
-		t.Fatalf("There should not be an error because the result is already cached.\n%v", err)
-	}
-	if result != result2 {
-		t.Fatal("The first and the second result are different, which should not be the case.")
-	}
-
-	// test reading from expired cache
-	currentTime = currentTime.Add(cacheDuration + 1)
-	_, err3 := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilenameEmpty, fnCreate)
-	if err3 == nil {
-		t.Fatal("There should be an error.")
-	}
-}
 
 func TestCreateRssFeedInvalidShowId(t *testing.T) {
 	urlToFilename := map[string](string){}
-	_, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilename, createRssFeed)
+	_, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilename, CreateArdRssFeed)
 	if err == nil {
 		t.Fatal("There should be an error.")
 	}
@@ -75,7 +23,7 @@ func TestCreateRssFeedInvalidEpisodeURL(t *testing.T) {
 	urlToFilename := map[string](string){}
 	urlToFilename["https://api.ardmediathek.de/page-gateway/widgets/ard/asset/Y3JpZDovL2Z1bmsubmV0LzEwMzE?pageNumber=0&pageSize=2"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzE.json"
 
-	_, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilename, createRssFeed)
+	_, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilename, CreateArdRssFeed)
 	if err == nil {
 		t.Fatal("There should be an error.")
 	}
@@ -87,7 +35,7 @@ func TestCreateRssFeedValid(t *testing.T) {
 	urlToFilename["https://api.ardmediathek.de/page-gateway/pages/ard/item/Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg?devicetype=pc&embedded=true"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg.json"
 	urlToFilename["https://api.ardmediathek.de/page-gateway/pages/ard/item/Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNjkzOA?devicetype=pc&embedded=true"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNjkzOA.json"
 
-	result, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilename, createRssFeed)
+	result, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilename, CreateArdRssFeed)
 	if err != nil {
 		t.Fatalf("There should not be an error.\n%v", err)
 	}
@@ -177,7 +125,7 @@ func TestConvertToString(t *testing.T) {
 }
 
 func TestGetCacheKey(t *testing.T) {
-	assertGetCacheKey(t, "123", 123, "123-123")
+	assertGetCacheKey(t, "123", 123, "123#123")
 }
 
 func assertGetCacheKey(t *testing.T, showID string, requestedWidth int, expectedKey string) {

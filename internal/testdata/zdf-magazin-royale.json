@@ -1,0 +1,112 @@
+{
+   "id":"zdf-magazin-royale-102",
+   "externalId":"SCMS_8fe17b32-302c-4220-b848-5a6394485d23",
+   "contentType":"brand",
+   "publicationDate":"2020-12-18T19:01:43.576+01:00",
+   "modificationDate":"2020-12-18T19:01:43.576+01:00",
+   "title":"ZDF Magazin Royale",
+   "editorialDate":"2020-12-21T14:59:14.305+01:00",
+   "teaserImageRef":{
+      "title":"SB - ZDF Magazin Royale - Sendungsteaser",
+      "altText":"ZDF Magazin Royale",
+      "caption":"ZDF Magazin Royale",
+      "source":"ZDF",
+      "profile":"http:\/\/zdf.de\/rels\/image",
+      "self":"\/content\/documents\/zdf\/comedy\/zdf-magazin-royale\/sb-material\/sb-zdf-magazin-royale-sendungsteaser-100.json",
+      "canonical":"\/content\/documents\/sb-zdf-magazin-royale-sendungsteaser-100.json",
+      "layouts":{
+         "1300x650":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1300x650?cb=1603985902822",
+         "1200x480":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1200x480?cb=1603985902822",
+         "1900x200":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1900x200?cb=1603985902822",
+         "1900x400":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1900x400?cb=1603985902822",
+         "640x720":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~640x720?cb=1603985902822",
+         "768xauto":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~768xauto?cb=1603985902822",
+         "1280xauto":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1280xauto?cb=1603985902822",
+         "240x270":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~240x270?cb=1603985902822",
+         "384x216":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~384x216?cb=1603985902822",
+         "760x340":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~760x340?cb=1603985902822",
+         "1140x240":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1140x240?cb=1603985902822",
+         "1140x120":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1140x120?cb=1603985902822",
+         "840x280":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~840x280?cb=1603985902822",
+         "1500x300":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1500x300?cb=1603985902822",
+         "840x360":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~840x360?cb=1603985902822",
+         "840x140":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~840x140?cb=1603985902822",
+         "225x400":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~225x400?cb=1603985902822",
+         "1800x720":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1800x720?cb=1603985902822",
+         "1900x570":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1900x570?cb=1603985902822",
+         "original":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~original?cb=1603985902822",
+         "384xauto":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~384xauto?cb=1603985902822",
+         "1920x1080":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1920x1080?cb=1603985902822",
+         "276x155":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~276x155?cb=1603985902822",
+         "1280x720":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1280x720?cb=1603985902822",
+         "1500x600":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1500x600?cb=1603985902822",
+         "1500x800":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1500x800?cb=1603985902822",
+         "936x520":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~936x520?cb=1603985902822",
+         "860x344":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~860x344?cb=1603985902822",
+         "380x170":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~380x170?cb=1603985902822",
+         "1152x1296":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~1152x1296?cb=1603985902822",
+         "405x720":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~405x720?cb=1603985902822",
+         "314x314":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~314x314?cb=1603985902822",
+         "768x432":"https:\/\/www.zdf.de\/assets\/sb-zdf-magazin-royale-sendungsteaser-100~768x432?cb=1603985902822"
+      }
+   },
+   "audioPodcastAvailable":false,
+   "videoPodcastAvailable":false,
+   "hasVideo":true,
+   "hideFacebookShareButton":false,
+   "hidePinterestShareButton":false,
+   "hideTwitterShareButton":false,
+   "hideWhatsappShareButton":false,
+   "profile":"http:\/\/zdf.de\/rels\/content\/page-index",
+   "self":"\/content\/documents\/zdf\/comedy\/zdf-magazin-royale",
+   "canonical":"\/content\/documents\/zdf-magazin-royale-102.json",
+   "http:\/\/zdf.de\/rels\/sharing-url":"https:\/\/www.zdf.de\/comedy\/zdf-magazin-royale",
+   "http:\/\/zdf.de\/rels\/search\/page-video-counter-with-video":{
+      "totalResultsCount":12,
+      "next":"\/search\/documents\/zdf\/comedy\/zdf-magazin-royale?q=*&limit=0&types=page-video&hasVideo=true&page=2",
+      "http:\/\/zdf.de\/rels\/search\/suggestions":[
+         
+      ],
+      "http:\/\/zdf.de\/rels\/search\/results":[
+         
+      ],
+      "profile":"http:\/\/zdf.de\/rels\/search\/result-page",
+      "self":"\/search\/documents\/zdf\/comedy\/zdf-magazin-royale?q=*&limit=0&types=page-video&hasVideo=true",
+      "first":"\/search\/documents\/zdf\/comedy\/zdf-magazin-royale?q=*&limit=0&types=page-video&hasVideo=true",
+      "facets":{
+         "teilbereich":[
+            
+         ],
+         "broadcasters":[
+            {
+               "docCount":12,
+               "key":"ZDF"
+            }
+         ],
+         "episodes":{
+            "docCount":7
+         },
+         "attrs":[
+            {
+               "docCount":7,
+               "key":"UT"
+            }
+         ]
+      }
+   },
+   "module":[
+      {
+         "shorttext-headline":"ZDF Magazin Royale \u2013 Gute Unterhaltung",
+         "shorttext-text":"Jan Böhmermann begrüßt zu seiner neuen Late-Night-Satire im Hauptprogramm. Er stößt Debatten an, begrüßt streitbare Gäste im Studio und musiziert mit dem Rundfunk-Tanzorchester Ehrenfeld. ",
+         "profile":"http:\/\/zdf.de\/rels\/content\/group-shorttext"
+      },
+      {
+         "title":"TV-Sendetermine",
+         "maxBroadcasts":3,
+         "showBroadcastRepeats":true,
+         "homeTvService":"all",
+         "showTitle":true,
+         "profile":"http:\/\/zdf.de\/rels\/content\/group-broadcasts"
+      }
+   ]
+}

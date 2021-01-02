@@ -12,33 +12,11 @@ import (
 	"github.com/seiferma/docker-ard2rss/internal/rssfeed"
 )
 
-// CreateArdRssFeedCached produces a RSS feed for a show of the ARD Mediathek.
-// It takes the ID of the show as requested by the JSON API, the requested media width, a pointer to the ArdAPI and a pointer to the
-// cache. It yields the RSS feed as string and an error.
+// CreateArdRssFeed creates an RSS feed for an ARD show.
 //
-// The requested with might not be met perfectly depending on the available media. However, the logic tries to get to the requested
-// width as close as possible.
-func CreateArdRssFeedCached(showID string, requestedMediaWidth int, ardAPI *ardapi.ArdAPI, cache *Cache) (result string, err error) {
-	// directly return valid cache entry
-	cacheKey := getCacheKey(showID, requestedMediaWidth)
-	var foundCacheEntry bool
-	result, foundCacheEntry = cache.GetContent(cacheKey)
-	if foundCacheEntry {
-		log.Printf("Answering request for %v / %v from cache.", showID, requestedMediaWidth)
-		return
-	}
-
-	// calculate RSS feed
-	result, err = createRssFeed(showID, requestedMediaWidth, ardAPI)
-
-	// cache result
-	if err == nil {
-		cache.StoreContent(cacheKey, result)
-	}
-	return
-}
-
-func createRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.ArdAPI) (result string, err error) {
+// It takes the ID of the show, a requested media width and the ARD API to use. It yields the feed as a string.
+// The effective media width might not perfectly match the requested media width but tries to get as close as possible.
+func CreateArdRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.ArdAPI) (result string, err error) {
 	var showInitial ardapi.Show
 	showInitial, err = ardAPI.GetShow(showID)
 	if err != nil {
@@ -77,10 +55,12 @@ func createRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.ArdAPI
 		}
 
 		feedItems[i] = rssfeed.FeedItem{
-			Title:                teaser.LongTitle,
-			Description:          &rssfeed.FeedDescription{Text: synopsis},
-			PubDate:              &teaser.BroadcastedOn,
-			GUID:                 teaser.ID,
+			Title:       teaser.LongTitle,
+			Description: &rssfeed.FeedDescription{Text: synopsis},
+			PubDate:     &teaser.BroadcastedOn,
+			GUID: &rssfeed.FeedGUID{
+				Text: teaser.ID,
+			},
 			Link:                 mediathekLink,
 			ITunesTitle:          teaser.LongTitle,
 			ITunesSummary:        &rssfeed.ItunesSummary{Text: synopsis},
@@ -147,8 +127,4 @@ func DoGetRequest(URL string) (result []byte, err error) {
 
 func toString(input interface{}) string {
 	return fmt.Sprintf("%v", input)
-}
-
-func getCacheKey(showID string, requestedWidth int) string {
-	return fmt.Sprintf("%v-%v", showID, requestedWidth)
 }

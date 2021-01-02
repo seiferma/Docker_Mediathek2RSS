@@ -4,18 +4,16 @@
         <description><![CDATA[Some long description.]]></description>
         <image>
             <url>http://foo.bar/foo.png</url>
+            <title></title>
+            <link></link>
         </image>
         <itunes:image href="http://foo.bar/foo.png"></itunes:image>
-        <itunes:explicit>false</itunes:explicit>
         <item>
             <title>TestItem</title>
             <link>http://foo.bar/item.html</link>
             <description><![CDATA[Some long description.]]></description>
-            <guid>foo-bar-uuid</guid>
-            <enclosure>
-                <url>http://foo.bar/item.mp4</url>
-                <type>video/mp4</type>
-            </enclosure>
+            <guid isPermaLink="false">foo-bar-uuid</guid>
+            <enclosure url="http://foo.bar/item.mp4" type="video/mp4"></enclosure>
             <itunes:duration>7:02</itunes:duration>
             <itunes:title>TestItem</itunes:title>
             <itunes:summary><![CDATA[Some long description.]]></itunes:summary>
