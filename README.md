@@ -14,7 +14,7 @@ All services support asking for a preferred quality by giving the expected media
 To avoid spamming the API of television channels, feeds are only regenerated every 5 minutes on request.
 
 ### ARD Shows
-The RSS feed for ARD shows is available via `ard/show/{showID}`. The show ID is a alphanumeric string that you can collect from the show's URL in the mediathek. For instance, `Y3JpZDovL2Z1bmsubmV0LzEwMzE` is the show id for the show `Walulis`, which has the URL `https://www.ardmediathek.de/ard/sendung/walulis/Y3JpZDovL2Z1bmsubmV0LzEwMzE/`. 
+The RSS feed for ARD shows is available via `/ard/show/{showID}`. The show ID is a alphanumeric string that you can collect from the show's URL in the mediathek. For instance, `Y3JpZDovL2Z1bmsubmV0LzEwMzE` is the show id for the show `Walulis`, which has the URL `https://www.ardmediathek.de/ard/sendung/walulis/Y3JpZDovL2Z1bmsubmV0LzEwMzE/`. 
 
 ### ZDF Shows
 The RSS feed for ZDF shows is available via `/zdf/show/byPath/{showPath}`. The show path is a substring of the URL to the show. For instance, `comedy/zdf-magazin-royale` is the show path for the show `ZDF Magazin Royale`, which has the URL `https://www.zdf.de/comedy/zdf-magazin-royale`.
