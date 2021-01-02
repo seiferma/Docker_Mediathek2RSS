@@ -39,7 +39,7 @@ func TestCreateRssFeedValid(t *testing.T) {
 	if err != nil {
 		t.Fatalf("There should not be an error.\n%v", err)
 	}
-	expectedBytes, err := ioutil.ReadFile("testdata/Y3JpZDovL2Z1bmsubmV0LzEwMzE.xml")
+	expectedBytes, err := ioutil.ReadFile("../testdata/Y3JpZDovL2Z1bmsubmV0LzEwMzE.xml")
 	expected := string(expectedBytes)
 
 	if strings.Compare(result, expected) != 0 {
@@ -56,7 +56,7 @@ func createRssFeedMocked(showID string, maxEpisodes int, requestedMediaWidth int
 			err = errors.New("unknown URL")
 			return
 		}
-		result, err = ioutil.ReadFile("testdata/" + filename)
+		result, err = ioutil.ReadFile("../testdata/" + filename)
 		return
 	}
 	ardAPI := ardapi.CreateArdAPIWithGetFunc(maxEpisodes, fnGetHTTP)
