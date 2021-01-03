@@ -67,7 +67,7 @@ func ardShowByIDServer(w http.ResponseWriter, r *http.Request) {
 	if error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, error)
-		log.Fatalf("There was an error while processing request for %v: %v", showID, error)
+		log.Printf("There was an error while processing request for %v: %v", showID, error)
 	}
 
 	// return produced feed
@@ -101,7 +101,7 @@ func zdfShowByPathServer(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, err)
-		log.Fatalf("There was an error while initializing the ZDF API: %v", err)
+		log.Printf("There was an error while initializing the ZDF API: %v", err)
 	}
 
 	// create RSS feed
@@ -114,7 +114,7 @@ func zdfShowByPathServer(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		fmt.Fprint(w, err)
-		log.Fatalf("There was an error while processing request for %v: %v", showPath, err)
+		log.Printf("There was an error while processing request for %v: %v", showPath, err)
 	}
 
 	// return produced feed

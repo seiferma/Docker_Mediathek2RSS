@@ -93,7 +93,7 @@ func (api *ArdAPI) GetShow(showID string) (result Show, err error) {
 	}
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		log.Fatalf("Could not parse JSON body for request to URL %v. %v", showURL, err)
+		log.Printf("Could not parse JSON body for request to URL %v. %v", showURL, err)
 		return
 	}
 
@@ -113,7 +113,7 @@ func (api *ArdAPI) GetVideoByURL(videoURL string) (result ShowVideo, err error) 
 	}
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		log.Fatalf("Could not parse JSON body for request to URL %v. %v", videoURL, err)
+		log.Printf("Could not parse JSON body for request to URL %v. %v", videoURL, err)
 		return
 	}
 	return
@@ -140,14 +140,14 @@ func doGetRequest(URL string) (result []byte, err error) {
 	var resp *http.Response
 	resp, err = http.Get(URL)
 	if err != nil {
-		log.Fatalf("Received error for URL %v: %v", URL, err)
+		log.Printf("Received error for URL %v: %v", URL, err)
 		return
 	}
 	defer resp.Body.Close()
 
 	result, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("Could not read body from GET request to URL %v.", URL)
+		log.Printf("Could not read body from GET request to URL %v.", URL)
 		return
 	}
 	return

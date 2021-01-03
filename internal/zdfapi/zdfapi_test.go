@@ -1,6 +1,7 @@
 package zdfapi
 
 import (
+	"errors"
 	"io/ioutil"
 	"testing"
 	"time"
@@ -167,13 +168,25 @@ func createAPISimple(t *testing.T, urlToFilename map[string](string)) ZDFApi {
 	}
 }
 
-func createFnGet(t *testing.T, urlToFilename map[string](string)) func(api *ZDFApi, URL string) (result []byte, err error) {
-	return func(api *ZDFApi, URL string) (result []byte, err error) {
+func createFnGet(t *testing.T, urlToFilename map[string](string)) func(api *ZDFApi, URL string, onlyPeek bool) (result []byte, err error) {
+	return func(api *ZDFApi, URL string, onlyPeek bool) (result []byte, err error) {
+		result = []byte{}
 		filePath, ok := urlToFilename[URL]
-		if !ok {
-			t.Fatalf("Unexpected URL %v has been requested.", URL)
+		if ok {
+			if !onlyPeek {
+				return ioutil.ReadFile(filePath)
+			}
+			return
 		}
-		return ioutil.ReadFile(filePath)
+
+		if onlyPeek {
+			result = []byte{}
+			err = errors.New("not found")
+			return
+		}
+
+		t.Fatalf("Unexpected URL %v has been requested.", URL)
+		return
 	}
 }
 

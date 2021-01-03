@@ -3,6 +3,7 @@ package zdffeed
 import (
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/seiferma/docker_mediathek2rss/internal/rssfeed"
@@ -49,7 +50,7 @@ func CreateZdfRssFeed(showPath string, requestedMediaWidth int, api *zdfapi.ZDFA
 	for i, result := range searchResults.Results {
 		var streams zdfapi.VideoStreams
 		streams, err = api.GetStreams(result.Video)
-		videoURL := findBestMatchingVideoStreamURL(&streams)
+		videoURL := findBestMatchingVideoStreamURL(api, &streams)
 
 		feed.Channel.FeedItems[i] = rssfeed.FeedItem{}
 		item := &feed.Channel.FeedItems[i]
@@ -117,7 +118,7 @@ func getDimensions(resolution string) (width, height int) {
 	return
 }
 
-func findBestMatchingVideoStreamURL(streams *zdfapi.VideoStreams) string {
+func findBestMatchingVideoStreamURL(api *zdfapi.ZDFApi, streams *zdfapi.VideoStreams) string {
 	const adaptive = false
 	const mimeType = wantedMimeType
 	const lang = "deu"
@@ -143,7 +144,7 @@ func findBestMatchingVideoStreamURL(streams *zdfapi.VideoStreams) string {
 
 	url, ok := qualityToURL["veryhigh"]
 	if ok {
-		return url
+		return findHighestResolutionStream(api, url)
 	}
 
 	url, ok = qualityToURL["high"]
@@ -161,4 +162,34 @@ func findBestMatchingVideoStreamURL(streams *zdfapi.VideoStreams) string {
 	}
 
 	return ""
+}
+
+var urlSuffixes = []string{
+	"3256k_p15v12.mp4",
+	"3296k_p15v13.mp4",
+	"3328k_p36v12.mp4",
+	"3328k_p36v13.mp4",
+	"3328k_p36v14.mp4",
+	"3328k_p35v14.mp4",
+	"3360k_p36v15.mp4",
+}
+
+func findHighestResolutionStream(api *zdfapi.ZDFApi, URL string) string {
+	byteURL := []byte(URL)
+	regex := regexp.MustCompile("_[0-9]+k_p[0-9]+v[0-9]+.mp4$")
+	if !regex.Match(byteURL) {
+		return URL
+	}
+	suffix := string(regex.Find(byteURL))
+
+	urlPrefix := strings.TrimSuffix(URL, suffix) + "_"
+	for j := len(urlSuffixes) - 1; j >= 0; j-- {
+		tryURL := urlPrefix + urlSuffixes[j]
+		_, err := api.Get(tryURL, true)
+		if err == nil {
+			return tryURL
+		}
+	}
+
+	return URL
 }
