@@ -140,7 +140,7 @@ func doGetRequest(URL string) (result []byte, err error) {
 	var resp *http.Response
 	resp, err = http.Get(URL)
 	if err != nil {
-		log.Fatalf("Received HTTP response %v for URL %v.", resp.StatusCode, URL)
+		log.Fatalf("Received error for URL %v: %v", URL, err)
 		return
 	}
 	defer resp.Body.Close()
