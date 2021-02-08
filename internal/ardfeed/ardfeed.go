@@ -53,7 +53,7 @@ func CreateArdRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.Ard
 		}
 
 		pubDataArray := make([]time.Time, 1)
-		pubDataArray[0] = teaser.BroadcastedOn.Add(0)
+		pubDataArray[0] = teaser.BroadcastedOn
 
 		feedItems[i] = rssfeed.FeedItem{
 			Title:       teaser.LongTitle,

@@ -67,7 +67,9 @@ func CreateZdfRssFeed(showPath string, requestedMediaWidth int, api *zdfapi.ZDFA
 			Text: result.Video.ID,
 		}
 		item.ITunesDurationString = rssfeed.CreateItunesDurationStringFromSeconds(result.Video.Streams.Streams.Duration)
-		item.PubDate = &result.Video.Date
+		pubDate := make([]time.Time, 1)
+		pubDate[0] = result.Video.Date
+		item.PubDate = &pubDate[0]
 		item.ITunesImage = &rssfeed.ITunesImage{
 			URL: findBestMatchingImageURL(&result.Video.Image),
 		}
