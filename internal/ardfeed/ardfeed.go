@@ -25,7 +25,7 @@ func CreateArdRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.Ard
 	feedTitle := showInitial.Teasers[0].Show.Title
 	feedDescription := showInitial.Teasers[0].Show.LongSynopsis
 	feedImage := getFeedImage(showInitial.Teasers[0].Show.Images)
-	feedImageURL, feedImageAlt := getFeedImageURLAndAlt(feedImage, requestedMediaWidth)
+	feedImageURL, _ := getFeedImageURLAndAlt(feedImage, requestedMediaWidth)
 
 	feedItems := make([]rssfeed.FeedItem, len(showInitial.Teasers))
 	for i, teaser := range showInitial.Teasers {
@@ -83,7 +83,7 @@ func CreateArdRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.Ard
 		Description: &rssfeed.FeedDescription{Text: feedDescription},
 		Image: &rssfeed.Image{
 			URL:   feedImageURL,
-			Title: feedImageAlt,
+			Title: feedTitle,
 		},
 		FeedItems: feedItems,
 	}
