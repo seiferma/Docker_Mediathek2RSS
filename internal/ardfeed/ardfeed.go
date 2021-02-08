@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"time"
 
 	"github.com/seiferma/docker_mediathek2rss/internal/ardapi"
 	"github.com/seiferma/docker_mediathek2rss/internal/rssfeed"
@@ -51,10 +52,13 @@ func CreateArdRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.Ard
 			}
 		}
 
+		pubDataArray := make([]time.Time, 1)
+		pubDataArray[0] = teaser.BroadcastedOn.Add(0)
+
 		feedItems[i] = rssfeed.FeedItem{
 			Title:       teaser.LongTitle,
 			Description: &rssfeed.FeedDescription{Text: synopsis},
-			PubDate:     &teaser.BroadcastedOn,
+			PubDate:     &pubDataArray[0],
 			GUID: &rssfeed.FeedGUID{
 				Text: teaser.ID,
 			},
