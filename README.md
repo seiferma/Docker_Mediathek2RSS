@@ -1,11 +1,14 @@
 # Mediathek2RSS
+[![](https://github.com/seiferma/Docker_Mediathek2RSS/actions/workflows/docker-publish.yml/badge.svg?branch=main)](https://github.com/seiferma/Docker_Mediathek2RSS/actions?query=branch%3Amain+)
+[![](https://img.shields.io/github/issues/seiferma/Docker_Mediathek2RSS.svg)](https://github.com/seiferma/Docker_Mediathek2RSS/issues)
+[![](https://img.shields.io/github/license/seiferma/Docker_Mediathek2RSS.svg)](https://github.com/seiferma/Docker_Mediathek2RSS/blob/main/LICENSE)
 
 The web service provides RSS podcast feeds for shows from German public television. As of now the web service considers
 * [ARD Mediathek](https://www.ardmediathek.de)
 * [ZDF Mediathek](https://www.zdf.de)
 
 ## Usage
-The docker image is available under `ghcr.io/seiferma/mediathek2rss:latest` (see the [package page](https://github.com/users/seiferma/packages/container/package/mediathek2rss) for available versions). When running a container, the web service listenes to requests on port `8080`.
+The docker image is available under `quay.io/seiferma/mediathek2rss:latest` (see the [registry page](https://quay.io/repository/seiferma/mediathek2rss?tab=tags) for available versions). When running a container, the web service listenes to requests on port `8080`.
 
 Different channels usually have different ways to identify shows. Have a look at the following paragraphs for detailed information about this.
 
