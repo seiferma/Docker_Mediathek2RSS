@@ -54,10 +54,10 @@ type ShowVideo struct {
 			Embedded struct {
 				MediaArray []struct {
 					MediaStreamArray []struct {
-						CDN    string `json:"_cdn"`
-						Width  int    `json:"_width"`
-						Height int    `json:"_height"`
-						Stream string `json:"_stream"`
+						CDN    string  `json:"_cdn"`
+						Width  int     `json:"_width"`
+						Height int     `json:"_height"`
+						Stream Streams `json:"_stream"`
 					} `json:"_mediaStreamArray"`
 				} `json:"_mediaArray"`
 			}
@@ -65,6 +65,29 @@ type ShowVideo struct {
 		Image    ShowImage
 		Synopsis string
 	}
+}
+
+// Streams represents an array of stream URLs.
+type Streams struct {
+	StreamUrls []string
+}
+
+// Custom logic to unmarshal a stream array from JSON.
+// The function creates an array of stream URLs no matter if JSON contains an array of stream URLs or just one single URL.
+func (s *Streams) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return errors.New("no data about streams available")
+	}
+
+	if data[0] == '[' {
+		json.Unmarshal(data, &s.StreamUrls)
+	} else {
+		var streamUrl string
+		json.Unmarshal(data, &streamUrl)
+		s.StreamUrls = append(s.StreamUrls, streamUrl)
+	}
+
+	return nil
 }
 
 // CreateArdAPI creates a new API instance taking configuration values to be considered when working with the API.

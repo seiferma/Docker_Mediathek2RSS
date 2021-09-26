@@ -46,9 +46,11 @@ func CreateArdRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.Ard
 		for _, mediaStream := range mediaStreams {
 			newDistance := math.Abs(float64(requestedMediaWidth - mediaStream.Width))
 			oldDistance := math.Abs(float64(requestedMediaWidth - lastWidth))
-			if strings.Contains(mediaStream.Stream, "mp4") && newDistance < oldDistance {
-				lastWidth = mediaStream.Width
-				lastURL = mediaStream.Stream
+			for _, stream := range mediaStream.Stream.StreamUrls {
+				if strings.Contains(stream, "mp4") && newDistance < oldDistance {
+					lastWidth = mediaStream.Width
+					lastURL = stream
+				}
 			}
 		}
 
