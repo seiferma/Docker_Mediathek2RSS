@@ -6,14 +6,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/seiferma/docker_mediathek2rss/internal"
 	"github.com/seiferma/docker_mediathek2rss/internal/rssfeed"
 	"github.com/seiferma/docker_mediathek2rss/internal/zdfapi"
 )
 
 const wantedMimeType = "video/mp4"
 
-// CreateZdfRssFeed creates an RSS feed for a given showPath and a requested media width. The ZDFApi has to be passed as well.
-func CreateZdfRssFeed(showPath string, requestedMediaWidth int, api *zdfapi.ZDFApi) (result string, err error) {
+// CreateZdfRssFeed creates an RSS feed for a given showPath and request parameters. The ZDFApi has to be passed as well.
+func CreateZdfRssFeed(showPath string, parameters internal.RequestParameters, api *zdfapi.ZDFApi) (result string, err error) {
 	var show zdfapi.Show
 	show, err = api.GetShow(showPath)
 	if err != nil {
@@ -45,15 +46,20 @@ func CreateZdfRssFeed(showPath string, requestedMediaWidth int, api *zdfapi.ZDFA
 	}
 	now := time.Now()
 	feed.Channel.LastBuildDate = &now
-	feed.Channel.FeedItems = make([]rssfeed.FeedItem, searchResults.ResultCount)
+	feed.Channel.FeedItems = make([]rssfeed.FeedItem, 0)
 
-	for i, result := range searchResults.Results {
+	for _, result := range searchResults.Results {
+
+		if result.Video.Streams.Streams.Duration < parameters.MinimumLengthInSeconds {
+			continue
+		}
+
 		var streams zdfapi.VideoStreams
-		streams, err = api.GetStreams(result.Video)
+		streams, _ = api.GetStreams(result.Video)
 		videoURL := findBestMatchingVideoStreamURL(api, &streams)
 
-		feed.Channel.FeedItems[i] = rssfeed.FeedItem{}
-		item := &feed.Channel.FeedItems[i]
+		feed.Channel.FeedItems = append(feed.Channel.FeedItems, rssfeed.FeedItem{})
+		item := &feed.Channel.FeedItems[len(feed.Channel.FeedItems)-1]
 
 		item.Title = result.Video.Title
 		item.ITunesTitle = item.Title

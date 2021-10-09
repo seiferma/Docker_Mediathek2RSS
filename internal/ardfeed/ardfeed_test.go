@@ -6,14 +6,17 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/seiferma/docker_mediathek2rss/internal"
 	"github.com/seiferma/docker_mediathek2rss/internal/ardapi"
 )
 
-const defaultMediaWidth = 1920
+var defaultParameters internal.RequestParameters = internal.RequestParameters{
+	Width: 1920,
+}
 
 func TestCreateRssFeedInvalidShowId(t *testing.T) {
 	urlToFilename := map[string](string){}
-	_, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilename, CreateArdRssFeed)
+	_, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultParameters, urlToFilename, CreateArdRssFeed)
 	if err == nil {
 		t.Fatal("There should be an error.")
 	}
@@ -23,7 +26,7 @@ func TestCreateRssFeedInvalidEpisodeURL(t *testing.T) {
 	urlToFilename := map[string](string){}
 	urlToFilename["https://api.ardmediathek.de/page-gateway/widgets/ard/asset/Y3JpZDovL2Z1bmsubmV0LzEwMzE?pageNumber=0&pageSize=2"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzE.json"
 
-	_, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilename, CreateArdRssFeed)
+	_, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultParameters, urlToFilename, CreateArdRssFeed)
 	if err == nil {
 		t.Fatal("There should be an error.")
 	}
@@ -35,7 +38,7 @@ func TestCreateRssFeedValid(t *testing.T) {
 	urlToFilename["https://api.ardmediathek.de/page-gateway/pages/ard/item/Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg?devicetype=pc&embedded=true"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg.json"
 	urlToFilename["https://api.ardmediathek.de/page-gateway/pages/ard/item/Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNjkzOA?devicetype=pc&embedded=true"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNjkzOA.json"
 
-	result, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultMediaWidth, urlToFilename, CreateArdRssFeed)
+	result, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, defaultParameters, urlToFilename, CreateArdRssFeed)
 	if err != nil {
 		t.Fatalf("There should not be an error.\n%v", err)
 	}
@@ -49,7 +52,30 @@ func TestCreateRssFeedValid(t *testing.T) {
 	}
 }
 
-func createRssFeedMocked(showID string, maxEpisodes int, requestedMediaWidth int, urlToFilename map[string](string), fnCreate func(showID string, requestedMediaWidth int, ardAPI *ardapi.ArdAPI) (result string, err error)) (result string, err error) {
+func TestCreateRssFeedValidWithEpisodeLengthFilter(t *testing.T) {
+	urlToFilename := map[string](string){}
+	urlToFilename["https://api.ardmediathek.de/page-gateway/widgets/ard/asset/Y3JpZDovL2Z1bmsubmV0LzEwMzE?pageNumber=0&pageSize=2"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzE.json"
+	urlToFilename["https://api.ardmediathek.de/page-gateway/pages/ard/item/Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg?devicetype=pc&embedded=true"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNzQ0Mg.json"
+	urlToFilename["https://api.ardmediathek.de/page-gateway/pages/ard/item/Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNjkzOA?devicetype=pc&embedded=true"] = "Y3JpZDovL2Z1bmsubmV0LzEwMzEvdmlkZW8vMTcwNjkzOA.json"
+
+	parameters := defaultParameters
+	parameters.MinimumLengthInSeconds = 10 * 60
+
+	result, err := createRssFeedMocked("Y3JpZDovL2Z1bmsubmV0LzEwMzE", 2, parameters, urlToFilename, CreateArdRssFeed)
+	if err != nil {
+		t.Fatalf("There should not be an error.\n%v", err)
+	}
+	expectedBytes, err := ioutil.ReadFile("../testdata/Y3JpZDovL2Z1bmsubmV0LzEwMzE_min10min.xml")
+	expected := string(expectedBytes)
+
+	if strings.Compare(result, expected) != 0 {
+		// ioutil.WriteFile("testdata/actual.xml", []byte(result), 0644)
+		// ioutil.WriteFile("testdata/expected.xml", []byte(expected), 0644)
+		t.Fatalf("The created XML is not as expected. Created:\n%v\n\nExpected:\n%v", result, expected)
+	}
+}
+
+func createRssFeedMocked(showID string, maxEpisodes int, parameters internal.RequestParameters, urlToFilename map[string](string), fnCreate func(showID string, parameters internal.RequestParameters, ardAPI *ardapi.ArdAPI) (result string, err error)) (result string, err error) {
 	fnGetHTTP := func(URL string) (result []byte, err error) {
 		filename, ok := urlToFilename[URL]
 		if !ok {
@@ -60,7 +86,7 @@ func createRssFeedMocked(showID string, maxEpisodes int, requestedMediaWidth int
 		return
 	}
 	ardAPI := ardapi.CreateArdAPIWithGetFunc(maxEpisodes, fnGetHTTP)
-	result, err = fnCreate(showID, requestedMediaWidth, &ardAPI)
+	result, err = fnCreate(showID, parameters, &ardAPI)
 	return
 }
 

@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -19,7 +17,6 @@ import (
 
 // Constants (maybe make this configurable)
 const listenAddress = ":8080"
-const defaultMediaWidth = 1920
 const cacheDuration = 5 * time.Minute
 const maxEpisodes = 50
 const ardShowByIDPathPrefix = "/ard/show/"
@@ -50,18 +47,18 @@ func ardShowByIDServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// extract requested media width from request
-	requestedMediaWidth := getRequestedWidth(r.URL)
-	log.Printf("Received a request for show ID %v with width %v.", showID, requestedMediaWidth)
+	// extract request parameters
+	requestParameters := internal.CreateRequestParametersFromURL(r.URL)
+	log.Printf("Received a request for show ID %v with parameters %v.", showID, requestParameters)
 
 	// create ARD API
 	ardAPI := ardapi.CreateArdAPI(maxEpisodes)
 
 	// create RSS feed
-	fnCreateRss := func(showID string, width int) (string, error) {
-		return ardfeed.CreateArdRssFeed(showID, width, &ardAPI)
+	fnCreateRss := func(showID string, parameters internal.RequestParameters) (string, error) {
+		return ardfeed.CreateArdRssFeed(showID, parameters, &ardAPI)
 	}
-	rssFeedString, error := internal.CreateRssFeedCached(showID, requestedMediaWidth, &feedCache, fnCreateRss)
+	rssFeedString, error := internal.CreateRssFeedCached(showID, requestParameters, &feedCache, fnCreateRss)
 
 	// report an error
 	if error != nil {
@@ -92,9 +89,9 @@ func zdfShowByPathServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// extract requested media width from request
-	requestedMediaWidth := getRequestedWidth(r.URL)
-	log.Printf("Received a request for show path %v with width %v.", showPath, requestedMediaWidth)
+	// extract request parameters
+	requestParameters := internal.CreateRequestParametersFromURL(r.URL)
+	log.Printf("Received a request for show path %v with parameters %v.", showPath, requestParameters)
 
 	// create ARD API
 	zdfAPI, err := zdfapi.CreateZDFApi(maxEpisodes)
@@ -105,10 +102,10 @@ func zdfShowByPathServer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create RSS feed
-	fnCreateRss := func(showPath string, width int) (string, error) {
-		return zdffeed.CreateZdfRssFeed(showPath, width, &zdfAPI)
+	fnCreateRss := func(showPath string, parameters internal.RequestParameters) (string, error) {
+		return zdffeed.CreateZdfRssFeed(showPath, parameters, &zdfAPI)
 	}
-	rssFeedString, err := internal.CreateRssFeedCached(showPath, requestedMediaWidth, &feedCache, fnCreateRss)
+	rssFeedString, err := internal.CreateRssFeedCached(showPath, requestParameters, &feedCache, fnCreateRss)
 
 	// report an error
 	if err != nil {
@@ -126,16 +123,4 @@ func zdfShowByPathServer(w http.ResponseWriter, r *http.Request) {
 func isValidZdfPath(path string) bool {
 	regex := regexp.MustCompile("^([a-zA-Z0-9-]+/)*[a-zA-Z0-9-]+$")
 	return regex.Match([]byte(path))
-}
-
-func getRequestedWidth(URL *url.URL) int {
-	requestedMediaWidth := defaultMediaWidth
-	widthParameter := URL.Query().Get("width")
-	if widthParameter != "" {
-		tmp, err := strconv.ParseInt(widthParameter, 10, 0)
-		if err == nil {
-			requestedMediaWidth = int(tmp)
-		}
-	}
-	return requestedMediaWidth
 }

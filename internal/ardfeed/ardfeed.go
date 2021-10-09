@@ -6,15 +6,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/seiferma/docker_mediathek2rss/internal"
 	"github.com/seiferma/docker_mediathek2rss/internal/ardapi"
 	"github.com/seiferma/docker_mediathek2rss/internal/rssfeed"
 )
 
 // CreateArdRssFeed creates an RSS feed for an ARD show.
 //
-// It takes the ID of the show, a requested media width and the ARD API to use. It yields the feed as a string.
+// It takes the ID of the show, request parameters and the ARD API to use. It yields the feed as a string.
 // The effective media width might not perfectly match the requested media width but tries to get as close as possible.
-func CreateArdRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.ArdAPI) (result string, err error) {
+func CreateArdRssFeed(showID string, parameters internal.RequestParameters, ardAPI *ardapi.ArdAPI) (result string, err error) {
 	var showInitial ardapi.Show
 	showInitial, err = ardAPI.GetShow(showID)
 	if err != nil {
@@ -25,10 +26,15 @@ func CreateArdRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.Ard
 	feedTitle := showInitial.Teasers[0].Show.Title
 	feedDescription := showInitial.Teasers[0].Show.LongSynopsis
 	feedImage := getFeedImage(showInitial.Teasers[0].Show.Images)
-	feedImageURL, _ := getFeedImageURLAndAlt(feedImage, requestedMediaWidth)
+	feedImageURL, _ := getFeedImageURLAndAlt(feedImage, parameters.Width)
 
-	feedItems := make([]rssfeed.FeedItem, len(showInitial.Teasers))
-	for i, teaser := range showInitial.Teasers {
+	feedItems := make([]rssfeed.FeedItem, 0)
+	for _, teaser := range showInitial.Teasers {
+
+		if teaser.Duration < parameters.MinimumLengthInSeconds {
+			continue
+		}
+
 		mediathekLink := "https://www.ardmediathek.de/ard/video/" + teaser.ID
 		videoAPIURL := teaser.Links.Target.Href
 		var video ardapi.ShowVideo
@@ -39,13 +45,13 @@ func CreateArdRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.Ard
 		mediaStreams := video.Widgets[0].MediaCollection.Embedded.MediaArray[0].MediaStreamArray
 		synopsis := video.Widgets[0].Synopsis
 		videoImage := video.Widgets[0].Image
-		videoImageURL, _ := getFeedImageURLAndAlt(videoImage, requestedMediaWidth)
+		videoImageURL, _ := getFeedImageURLAndAlt(videoImage, parameters.Width)
 
 		lastWidth := 0
 		var lastURL string
 		for _, mediaStream := range mediaStreams {
-			newDistance := math.Abs(float64(requestedMediaWidth - mediaStream.Width))
-			oldDistance := math.Abs(float64(requestedMediaWidth - lastWidth))
+			newDistance := math.Abs(float64(parameters.Width - mediaStream.Width))
+			oldDistance := math.Abs(float64(parameters.Width - lastWidth))
 			for _, stream := range mediaStream.Stream.StreamUrls {
 				if strings.Contains(stream, "mp4") && newDistance < oldDistance {
 					lastWidth = mediaStream.Width
@@ -57,7 +63,7 @@ func CreateArdRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.Ard
 		pubDataArray := make([]time.Time, 1)
 		pubDataArray[0] = teaser.BroadcastedOn
 
-		feedItems[i] = rssfeed.FeedItem{
+		item := rssfeed.FeedItem{
 			Title:       teaser.LongTitle,
 			Description: &rssfeed.FeedDescription{Text: synopsis},
 			PubDate:     &pubDataArray[0],
@@ -76,6 +82,7 @@ func CreateArdRssFeed(showID string, requestedMediaWidth int, ardAPI *ardapi.Ard
 				Type: "video/mp4",
 			},
 		}
+		feedItems = append(feedItems, item)
 	}
 
 	feed := rssfeed.CreateFeed()

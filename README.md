@@ -12,7 +12,7 @@ The docker image is available under `quay.io/seiferma/mediathek2rss:latest` (see
 
 Different channels usually have different ways to identify shows. Have a look at the following paragraphs for detailed information about this.
 
-All services support asking for a preferred quality by giving the expected media width in pixels. The width is passed as query parameter by appending `?width={n}` to the URL. For instance, by specifying `720`, you request a HD ready video stream. The web service tries to meet this request as close as possible.
+All services support asking for a preferred quality by giving the expected media width in pixels. The width is passed as query parameter by appending `?width={n}` to the URL. For instance, by specifying `720`, you request a HD ready video stream. The web service tries to meet this request as close as possible. It is possible to filter episodes by its length. By appending the query parameter `?minLength={n}` to the URL, all episodes that have less than `n` seconds will not be part of the RSS feed.
 
 To avoid spamming the API of television channels, feeds are only regenerated every 5 minutes on request.
 

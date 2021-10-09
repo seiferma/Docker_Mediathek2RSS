@@ -1,0 +1,40 @@
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+    <channel>
+        <title>ZDF Magazin Royale</title>
+        <description><![CDATA[Jan Böhmermann begrüßt zu seiner neuen Late-Night-Satire im Hauptprogramm. Er stößt Debatten an, begrüßt streitbare Gäste im Studio und musiziert mit dem Rundfunk-Tanzorchester Ehrenfeld. ]]></description>
+        <link>https://www.zdf.de/comedy/zdf-magazin-royale</link>
+        <lastBuildDate>NOW</lastBuildDate>
+        <image>
+            <url>https://www.zdf.de/assets/sb-zdf-magazin-royale-sendungsteaser-100~1920x1080?cb=1603985902822</url>
+            <title>ZDF Magazin Royale</title>
+            <link>https://www.zdf.de/comedy/zdf-magazin-royale</link>
+        </image>
+        <itunes:subtitle>ZDF Magazin Royale</itunes:subtitle>
+        <itunes:summary><![CDATA[Jan Böhmermann begrüßt zu seiner neuen Late-Night-Satire im Hauptprogramm. Er stößt Debatten an, begrüßt streitbare Gäste im Studio und musiziert mit dem Rundfunk-Tanzorchester Ehrenfeld. ]]></itunes:summary>
+        <itunes:image href="https://www.zdf.de/assets/sb-zdf-magazin-royale-sendungsteaser-100~1920x1080?cb=1603985902822"></itunes:image>
+        <item>
+            <title>Corona-Unternehmer des Jahres </title>
+            <link>https://www.zdf.de/comedy/zdf-magazin-royale/zdf-magazin-royale-106.html</link>
+            <description><![CDATA[2020 ging es Ihnen richtig scheiße? Selber Schuld! Sie könnten eine tödliche Pandemie auch mal als Chance begreifen. ]]></description>
+            <pubDate>2020-12-18T23:30:00+01:00</pubDate>
+            <guid isPermaLink="false">zdf-magazin-royale-106</guid>
+            <enclosure url="https://rodlzdf-a.akamaihd.net/none/zdf/20/12/201218_2330_sendung_zmr/3/201218_2330_sendung_zmr_1628k_p13v15.mp4" type="video/mp4"></enclosure>
+            <itunes:duration>31:28</itunes:duration>
+            <itunes:title>Corona-Unternehmer des Jahres </itunes:title>
+            <itunes:summary><![CDATA[2020 ging es Ihnen richtig scheiße? Selber Schuld! Sie könnten eine tödliche Pandemie auch mal als Chance begreifen. ]]></itunes:summary>
+            <itunes:image href="https://www.zdf.de/assets/zdf-magazin-royale-vom-18-dezember-2020-100~1920x1080?cb=1608305343234"></itunes:image>
+        </item>
+        <item>
+            <title> Das Humboldt Forum - Raubkunst in Berlin?</title>
+            <link>https://www.zdf.de/comedy/zdf-magazin-royale/zdf-magazin-royale-108.html</link>
+            <description><![CDATA[Das Humboldt Forum ist das neue Vorzeige-Museum der Berlin-Mitte-Hipster und das größte Kulturprojekt Europas!]]></description>
+            <pubDate>2020-12-11T23:00:00+01:00</pubDate>
+            <guid isPermaLink="false">zdf-magazin-royale-108</guid>
+            <enclosure url="https://rodlzdf-a.akamaihd.net/none/zdf/20/12/201211_2300_sendung_zmr/5/201211_2300_sendung_zmr_1628k_p13v15.mp4" type="video/mp4"></enclosure>
+            <itunes:duration>30:04</itunes:duration>
+            <itunes:title> Das Humboldt Forum - Raubkunst in Berlin?</itunes:title>
+            <itunes:summary><![CDATA[Das Humboldt Forum ist das neue Vorzeige-Museum der Berlin-Mitte-Hipster und das größte Kulturprojekt Europas!]]></itunes:summary>
+            <itunes:image href="https://www.zdf.de/assets/zdf-magazin-royale-vom-11-dezember-2020-100~1920x1080?cb=1607714483256"></itunes:image>
+        </item>
+    </channel>
+</rss>

@@ -17,29 +17,42 @@ func TestCreateRssFeedCachedValid(t *testing.T) {
 	cache := CreateCacheWithNowFunction(cacheDuration, fnNow)
 
 	showID := "test"
-	mediaWidth := 42
+	parameters := RequestParameters{
+		Width: 42,
+	}
 	counter := 0
-	fnCreate := func(s string, i int) (string, error) {
+	fnCreate := func(s string, parameters RequestParameters) (string, error) {
 		counter = counter + 1
 		return fmt.Sprintf("%v", counter), nil
 	}
 
 	var result string
-	result, _ = CreateRssFeedCached(showID, mediaWidth, &cache, fnCreate)
+	result, _ = CreateRssFeedCached(showID, parameters, &cache, fnCreate)
 	assertEquals(t, "1", result)
-	result, _ = CreateRssFeedCached(showID, mediaWidth, &cache, fnCreate)
+	result, _ = CreateRssFeedCached(showID, parameters, &cache, fnCreate)
 	assertEquals(t, "1", result)
 	currentTime = currentTime.Add(cacheDuration + 1)
-	result, _ = CreateRssFeedCached(showID, mediaWidth, &cache, fnCreate)
+	result, _ = CreateRssFeedCached(showID, parameters, &cache, fnCreate)
 	assertEquals(t, "2", result)
 }
 
 func TestGetCacheKey(t *testing.T) {
-	assertGetCacheKey(t, "123", 123, "123#123")
+	parameters := RequestParameters{
+		Width:                  42,
+		MinimumLengthInSeconds: 3,
+	}
+	assertGetCacheKey(t, "123", parameters, "123#{42 3}")
 }
 
-func assertGetCacheKey(t *testing.T, showID string, requestedWidth int, expectedKey string) {
-	cacheKey := getCacheKey(showID, requestedWidth)
+func TestGetCacheKeyWithMissingParameters(t *testing.T) {
+	parameters := RequestParameters{
+		Width: 42,
+	}
+	assertGetCacheKey(t, "123", parameters, "123#{42 0}")
+}
+
+func assertGetCacheKey(t *testing.T, showID string, parameters RequestParameters, expectedKey string) {
+	cacheKey := getCacheKey(showID, parameters)
 	assertEquals(t, expectedKey, cacheKey)
 }
 
