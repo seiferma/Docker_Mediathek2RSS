@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -15,6 +16,9 @@ import (
 	"strings"
 	"time"
 )
+
+const funkDomainId = 741
+const funkDomainHash = "CA4SDGOBTRM421IRNO0"
 
 // ArdAPI gives access to various operations of the ARD Mediathek API.
 // Its main purpose is to hold configuration parameters and provide them to
@@ -279,10 +283,15 @@ func (showVideo *ShowVideo) getNumberOfNonAdaptiveStreams() int {
 }
 
 func (api *ArdAPI) initializeNexxSession() (cid string, err error) {
+	currentTime := time.Now().Unix()
+	randomNumber := 10000 + rand.Intn(90000)
+	deviceId := fmt.Sprintf("%v:%v", currentTime, randomNumber)
+
 	postData := url.Values{
-		"nxp_devh": {"1647630511:11936"}, // from cookies?
+		"nxp_devh": {deviceId},
 	}
-	body, err := api.fnPostRequest("https://api.nexx.cloud/v3/741/session/init", postData, map[string]string{})
+	URL := fmt.Sprintf("https://api.nexx.cloud/v3/%v/session/init", funkDomainId)
+	body, err := api.fnPostRequest(URL, postData, map[string]string{})
 	if err != nil {
 		return
 	}
@@ -301,9 +310,6 @@ func (api *ArdAPI) initializeNexxSession() (cid string, err error) {
 }
 
 func (api *ArdAPI) getNexxVideoMetadata(videoId, cid string) (result NexxVideoMetadata, err error) {
-	const domainId = 741
-	const domainHash = "CA4SDGOBTRM421IRNO0"
-
 	postData := url.Values{
 		"addStatusDetails": {"1"},
 		"addStreamDetails": {"1"},
@@ -313,12 +319,12 @@ func (api *ArdAPI) getNexxVideoMetadata(videoId, cid string) (result NexxVideoMe
 		"captionFormat":    {"data"},
 	}
 
-	requestTokenValue := getMD5Hash(fmt.Sprintf("%v%v%v", "byid", domainId, domainHash))
+	requestTokenValue := getMD5Hash(fmt.Sprintf("%v%v%v", "byid", funkDomainId, funkDomainHash))
 	headers := map[string]string{
 		"x-request-cid":   cid,
 		"x-request-token": requestTokenValue,
 	}
-	URL := fmt.Sprintf("https://api.nexx.cloud/v3/%v/videos/byid/%v", domainId, videoId)
+	URL := fmt.Sprintf("https://api.nexx.cloud/v3/%v/videos/byid/%v", funkDomainId, videoId)
 	body, err := api.fnPostRequest(URL, postData, headers)
 	if err != nil {
 		return
