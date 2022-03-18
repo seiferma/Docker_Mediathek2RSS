@@ -85,7 +85,7 @@ func createRssFeedMocked(showID string, maxEpisodes int, parameters internal.Req
 		result, err = ioutil.ReadFile("../testdata/" + filename)
 		return
 	}
-	ardAPI := ardapi.CreateArdAPIWithGetFunc(maxEpisodes, fnGetHTTP)
+	ardAPI := ardapi.CreateArdAPIWithGetFunc(maxEpisodes, fnGetHTTP, nil)
 	result, err = fnCreate(showID, parameters, &ardAPI)
 	return
 }

@@ -19,7 +19,7 @@ func TestGetShow(t *testing.T) {
 	}
 
 	// get a show from the API
-	ardAPI := CreateArdAPIWithGetFunc(maxEpisodes, fnGet)
+	ardAPI := CreateArdAPIWithGetFunc(maxEpisodes, fnGet, nil)
 	result, err := ardAPI.GetShow(showID)
 
 	// assert results
@@ -42,7 +42,7 @@ func TestGetShowWithoutTeasers(t *testing.T) {
 	}
 
 	// get a show from the API
-	ardAPI := CreateArdAPIWithGetFunc(maxEpisodes, fnGet)
+	ardAPI := CreateArdAPIWithGetFunc(maxEpisodes, fnGet, nil)
 	_, err := ardAPI.GetShow(showID)
 
 	// assert results
@@ -61,7 +61,7 @@ func TestGetShowWithLessThanMaxTeasers(t *testing.T) {
 	}
 
 	// get a show from the API
-	ardAPI := CreateArdAPIWithGetFunc(maxEpisodes, fnGet)
+	ardAPI := CreateArdAPIWithGetFunc(maxEpisodes, fnGet, nil)
 	result, err := ardAPI.GetShow(showID)
 
 	// assert results
@@ -84,7 +84,7 @@ func TestGetVideoByURLWithMultipleStreamURLs(t *testing.T) {
 
 	// get a show from the API
 	const maxEpisodes = 2
-	ardAPI := CreateArdAPIWithGetFunc(maxEpisodes, fnGet)
+	ardAPI := CreateArdAPIWithGetFunc(maxEpisodes, fnGet, nil)
 	result, err := ardAPI.GetVideoByURL("https://api.ardmediathek.de/page-gateway/pages/ard/item/Y3JpZDovL2Rhc2Vyc3RlLmRlL3RhZ2VzdGhlbWVuL2Q1N2VjY2VmLWY2ZTQtNDVhZS1iNGNlLTcyMThiZjBhMzMxZg?devicetype=pc&embedded=true")
 
 	// assert that result exists
@@ -95,13 +95,13 @@ func TestGetVideoByURLWithMultipleStreamURLs(t *testing.T) {
 
 	// assert stream URLs of show
 	mediaStreams := result.Widgets[0].MediaCollection.Embedded.MediaArray[0].MediaStreamArray
-	if !assertEquals(t, 5, len(mediaStreams)) ||
-		!assertEquals(t, 1, len(mediaStreams[0].Stream.StreamUrls)) ||
-		!assertEquals(t, "https://adaptive.tagesschau.de/i/video/2021/0925/TV-20210925-2356-5100.,webs,websm,webm,webml,webl,webxl,.h264.mp4.csmil/master.m3u8", mediaStreams[0].Stream.StreamUrls[0]) ||
-		!assertEquals(t, 3, len(mediaStreams[1].Stream.StreamUrls)) ||
-		!assertContains(t, mediaStreams[1].Stream.StreamUrls, "https://media.tagesschau.de/video/2021/0925/TV-20210925-2356-5100.websm.h264.mp4") ||
-		!assertContains(t, mediaStreams[1].Stream.StreamUrls, "https://media.tagesschau.de/video/2021/0925/TV-20210925-2356-5100.webs.h264.mp4") ||
-		!assertContains(t, mediaStreams[1].Stream.StreamUrls, "https://download.media.tagesschau.de/video/2021/0925/TV-20210925-2356-5100.websm.h264.mp4") {
+	if !assertEquals(t, 5, len(*mediaStreams)) ||
+		!assertEquals(t, 1, len((*mediaStreams)[0].Stream.StreamUrls)) ||
+		!assertEquals(t, "https://adaptive.tagesschau.de/i/video/2021/0925/TV-20210925-2356-5100.,webs,websm,webm,webml,webl,webxl,.h264.mp4.csmil/master.m3u8", (*mediaStreams)[0].Stream.StreamUrls[0]) ||
+		!assertEquals(t, 3, len((*mediaStreams)[1].Stream.StreamUrls)) ||
+		!assertContains(t, (*mediaStreams)[1].Stream.StreamUrls, "https://media.tagesschau.de/video/2021/0925/TV-20210925-2356-5100.websm.h264.mp4") ||
+		!assertContains(t, (*mediaStreams)[1].Stream.StreamUrls, "https://media.tagesschau.de/video/2021/0925/TV-20210925-2356-5100.webs.h264.mp4") ||
+		!assertContains(t, (*mediaStreams)[1].Stream.StreamUrls, "https://download.media.tagesschau.de/video/2021/0925/TV-20210925-2356-5100.websm.h264.mp4") {
 		return
 	}
 }

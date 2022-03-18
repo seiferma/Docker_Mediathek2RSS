@@ -49,7 +49,7 @@ func CreateArdRssFeed(showID string, parameters internal.RequestParameters, ardA
 
 		lastWidth := 0
 		var lastURL string
-		for _, mediaStream := range mediaStreams {
+		for _, mediaStream := range *mediaStreams {
 			newDistance := math.Abs(float64(parameters.Width - mediaStream.Width))
 			oldDistance := math.Abs(float64(parameters.Width - lastWidth))
 			for _, stream := range mediaStream.Stream.StreamUrls {

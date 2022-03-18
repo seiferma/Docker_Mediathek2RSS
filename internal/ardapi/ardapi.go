@@ -1,12 +1,18 @@
 package ardapi
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
+	"regexp"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -14,8 +20,9 @@ import (
 // Its main purpose is to hold configuration parameters and provide them to
 // the API functions.
 type ArdAPI struct {
-	maxEpisodes  int
-	fnGetRequest func(string) ([]byte, error)
+	maxEpisodes   int
+	fnGetRequest  func(string) ([]byte, error)
+	fnPostRequest func(string, url.Values, map[string]string) ([]byte, error)
 }
 
 // ShowImage represents an image DTO from the API.
@@ -36,6 +43,7 @@ type Show struct {
 			}
 		}
 		Show struct {
+			ID           string `json:"id"`
 			Title        string
 			LongSynopsis string
 			Images       map[string](ShowImage)
@@ -49,16 +57,17 @@ type Show struct {
 
 // ShowVideo represents a DTO for a video of a show from the API.
 type ShowVideo struct {
+	Tracking struct {
+		AtiCustomVars struct {
+			Channel    string
+			MetadataId string
+		}
+	}
 	Widgets []struct {
 		MediaCollection struct {
 			Embedded struct {
 				MediaArray []struct {
-					MediaStreamArray []struct {
-						CDN    string  `json:"_cdn"`
-						Width  int     `json:"_width"`
-						Height int     `json:"_height"`
-						Stream Streams `json:"_stream"`
-					} `json:"_mediaStreamArray"`
+					MediaStreamArray *[]MediaStreamArray `json:"_mediaStreamArray"`
 				} `json:"_mediaArray"`
 			}
 		}
@@ -67,9 +76,37 @@ type ShowVideo struct {
 	}
 }
 
+type MediaStreamArray struct {
+	CDN    string  `json:"_cdn"`
+	Width  int     `json:"_width"`
+	Height int     `json:"_height"`
+	Stream Streams `json:"_stream"`
+}
+
 // Streams represents an array of stream URLs.
 type Streams struct {
 	StreamUrls []string
+}
+
+type NexxInitSessionResponse struct {
+	Result struct {
+		General struct {
+			Cid string
+		}
+	}
+}
+
+type NexxVideoMetadata struct {
+	Result struct {
+		Streamdata struct {
+			CdnType               string
+			CdnShieldHTTPS        string
+			QAccount              string
+			QPrefix               string
+			QLocator              string
+			AzureFileDistribution string
+		}
+	}
 }
 
 // Custom logic to unmarshal a stream array from JSON.
@@ -93,16 +130,17 @@ func (s *Streams) UnmarshalJSON(data []byte) error {
 // CreateArdAPI creates a new API instance taking configuration values to be considered when working with the API.
 // The maxEpisodes parameter defines how many episodes of a show shall be received at most.
 func CreateArdAPI(maxEpisodes int) ArdAPI {
-	return CreateArdAPIWithGetFunc(maxEpisodes, doGetRequest)
+	return CreateArdAPIWithGetFunc(maxEpisodes, doGetRequest, doPostRequest)
 }
 
 // CreateArdAPIWithGetFunc creates a new API instance taking configuration values to be considered when working with the API.
 // The maxEpisodes parameter defines how many episodes of a show shall be received at most.
 // The fnGetRequest parameter provides a function that carries out a get request and provides the body as byte array.
-func CreateArdAPIWithGetFunc(maxEpisodes int, fnGetRequest func(string) ([]byte, error)) ArdAPI {
+func CreateArdAPIWithGetFunc(maxEpisodes int, fnGetRequest func(string) ([]byte, error), fnPostRequest func(string, url.Values, map[string]string) ([]byte, error)) ArdAPI {
 	return ArdAPI{
-		maxEpisodes:  maxEpisodes,
-		fnGetRequest: fnGetRequest,
+		maxEpisodes:   maxEpisodes,
+		fnGetRequest:  fnGetRequest,
+		fnPostRequest: fnPostRequest,
 	}
 }
 
@@ -139,7 +177,160 @@ func (api *ArdAPI) GetVideoByURL(videoURL string) (result ShowVideo, err error) 
 		log.Printf("Could not parse JSON body for request to URL %v. %v", videoURL, err)
 		return
 	}
+
+	if result.Tracking.AtiCustomVars.Channel == "funk" {
+		re := regexp.MustCompile("video/([0-9]+)$")
+		match := re.FindStringSubmatch(result.Tracking.AtiCustomVars.MetadataId)
+		if match == nil {
+			return
+		}
+		funkVideoId := match[1]
+
+		err = api.replaceMediaStreamArrayUsingFunkVideoId(funkVideoId, &result)
+		if err != nil {
+			log.Printf("Could not replace media stream by funk videos. %v", err)
+			err = nil
+		}
+	}
+
 	return
+}
+
+func (api *ArdAPI) replaceMediaStreamArrayUsingFunkVideoId(id string, showVideo *ShowVideo) (err error) {
+	// there are already streams available, so we should not try to replace anything here
+	if showVideo.getNumberOfNonAdaptiveStreams() != 0 {
+		return
+	}
+
+	// get cid, which is required for getting metadata
+	cid, err := api.initializeNexxSession()
+	if err != nil {
+		return
+	}
+
+	// get metadata about video
+	videoMetadata, err := api.getNexxVideoMetadata(id, cid)
+	if err != nil {
+		return
+	}
+
+	// video url (prefix of all is result.streamdata)
+	// https://[cdnShieldHTTPS]/[qAccount]/files/[qPrefix]/[qLocator]/[azureFileDistribution].mp4
+	// example of azureFileDistribution: (3001:1280x720:2-w7FWPztXm9hnZpbjMcKq,4152:1920x1080:1-Nf3kJwdpTrgHGLY2jtPv)
+
+	// parse file distribution data
+	re := regexp.MustCompile("[0-9]+:([0-9]+)x([0-9]+):([^:,]+)")
+	matches := re.FindAllStringSubmatch(videoMetadata.Result.Streamdata.AzureFileDistribution, -1)
+	if matches == nil {
+		return
+	}
+
+	// build new media stream array
+	newMediaStreamArray := make([]MediaStreamArray, len(matches))
+	for i, match := range matches {
+		width, _ := strconv.Atoi(match[1])
+		height, _ := strconv.Atoi(match[2])
+		selector := match[3]
+		videoUrl := fmt.Sprintf("https://%v%v/files/%v/%v/%v.mp4",
+			videoMetadata.Result.Streamdata.CdnShieldHTTPS,
+			videoMetadata.Result.Streamdata.QAccount,
+			videoMetadata.Result.Streamdata.QPrefix,
+			videoMetadata.Result.Streamdata.QLocator,
+			selector)
+		newMediaStreamArray[i] = MediaStreamArray{
+			CDN:    videoMetadata.Result.Streamdata.CdnType,
+			Width:  width,
+			Height: height,
+			Stream: Streams{
+				StreamUrls: []string{
+					videoUrl,
+				},
+			},
+		}
+	}
+
+	// replace media stream array in existing show video
+	for i, widget := range showVideo.Widgets {
+		for j := 0; j < len(widget.MediaCollection.Embedded.MediaArray); j++ {
+			showVideo.Widgets[i].MediaCollection.Embedded.MediaArray[j].MediaStreamArray = &newMediaStreamArray
+		}
+	}
+
+	return
+}
+
+func (showVideo *ShowVideo) getNumberOfNonAdaptiveStreams() int {
+	nonAdaptiveStreams := 0
+	for _, widget := range showVideo.Widgets {
+		for _, mediaArray := range widget.MediaCollection.Embedded.MediaArray {
+			arrayPtr := mediaArray.MediaStreamArray
+			if arrayPtr != nil {
+				for _, mediaStreamArray := range *arrayPtr {
+					if mediaStreamArray.Width != 0 {
+						nonAdaptiveStreams++
+					}
+				}
+
+			}
+
+		}
+	}
+	return nonAdaptiveStreams
+}
+
+func (api *ArdAPI) initializeNexxSession() (cid string, err error) {
+	postData := url.Values{
+		"nxp_devh": {"1647630511:11936"}, // from cookies?
+	}
+	body, err := api.fnPostRequest("https://api.nexx.cloud/v3/741/session/init", postData, map[string]string{})
+	if err != nil {
+		return
+	}
+	var initSessionResponse NexxInitSessionResponse
+	err = json.Unmarshal(body, &initSessionResponse)
+	if err != nil {
+		return
+	}
+	if initSessionResponse.Result.General.Cid == "" {
+		err = errors.New("No cid from initializing session.")
+		return
+	}
+
+	cid = initSessionResponse.Result.General.Cid
+	return
+}
+
+func (api *ArdAPI) getNexxVideoMetadata(videoId, cid string) (result NexxVideoMetadata, err error) {
+	const domainId = 741
+	const domainHash = "CA4SDGOBTRM421IRNO0"
+
+	postData := url.Values{
+		"addStatusDetails": {"1"},
+		"addStreamDetails": {"1"},
+		"addFeatures":      {"1"},
+		"addCaptions":      {"1"},
+		"addBumpers":       {"1"},
+		"captionFormat":    {"data"},
+	}
+
+	requestTokenValue := getMD5Hash(fmt.Sprintf("%v%v%v", "byid", domainId, domainHash))
+	headers := map[string]string{
+		"x-request-cid":   cid,
+		"x-request-token": requestTokenValue,
+	}
+	URL := fmt.Sprintf("https://api.nexx.cloud/v3/%v/videos/byid/%v", domainId, videoId)
+	body, err := api.fnPostRequest(URL, postData, headers)
+	if err != nil {
+		return
+	}
+
+	err = json.Unmarshal(body, &result)
+	return
+}
+
+func getMD5Hash(text string) string {
+	hash := md5.Sum([]byte(text))
+	return hex.EncodeToString(hash[:])
 }
 
 func (show Show) hasAtLeastOneValidTeaser() bool {
@@ -171,6 +362,37 @@ func doGetRequest(URL string) (result []byte, err error) {
 	result, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Could not read body from GET request to URL %v.", URL)
+		return
+	}
+	return
+}
+
+func doPostRequest(URL string, data url.Values, headers map[string]string) (result []byte, err error) {
+	var resp *http.Response
+
+	postData := strings.NewReader(data.Encode())
+	req, err := http.NewRequest("POST", URL, postData)
+	if err != nil {
+		log.Printf("Error in building POST request for URL %v: %v", URL, err)
+		return
+	}
+
+	for k, v := range headers {
+		req.Header.Add(k, v)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	client := &http.Client{}
+	resp, err = client.Do(req)
+	if err != nil {
+		log.Printf("Received error for URL %v: %v", URL, err)
+		return
+	}
+	defer resp.Body.Close()
+
+	result, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Could not read body from POST request to URL %v.", URL)
 		return
 	}
 	return
