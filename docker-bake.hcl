@@ -7,5 +7,6 @@ group "default" {
 }
 
 target "default" {
+  platforms = ["linux/amd64", "linux/arm64"]
   tags = ["quay.io/seiferma/mediathek2rss:${VERSION}", "quay.io/seiferma/mediathek2rss:latest"]
 }

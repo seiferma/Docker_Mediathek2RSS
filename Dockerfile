@@ -1,8 +1,14 @@
-FROM golang:alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:alpine AS builder
+
+ARG TARGETARCH
+ARG GOOS=linux
+ARG CGOENABLED=0
+
 RUN apk add --no-cache make ca-certificates git
 WORKDIR /go/src/app
 COPY . .
-RUN make RELEASE=1 build test
+RUN export GOARCH=$TARGETARCH && \
+    make RELEASE=1 build test
 
 FROM scratch
 COPY --from=builder /go/src/app/build/mediathek2rss /opt/mediathek2rss
